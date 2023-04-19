@@ -112,6 +112,7 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
                   })
                   //Show to the table
                   io.emit("scrap_result", result);
+                  result = [];
               }
           } catch (error) {
               console.error("pass")
