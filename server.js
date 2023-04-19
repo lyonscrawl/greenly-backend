@@ -134,6 +134,8 @@ function scrapAllURL(selectedOption, dataURL, dataURLIndex, debHere, incHere){
     if(debHere === dataURL.length) {
         io.emit("scrap_end", debHere);
         clearInterval(timerInt)
+        deb = 0
+        inc = deb + 1
     } else{
         console.log(debHere, dataURL[debHere]["Entreprise"])
         for(let i = debHere; i<incHere; i++){
