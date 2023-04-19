@@ -46,9 +46,8 @@ io.on('connection', function (socket) {
     timerInt = setInterval(()=>{
         console.log('get_scrap_timer_int')
         scrapAllURL(selectedOption, dataURL[0], 0, deb, inc)
-    }, 10 * 1000)
+    }, 5 * 1000)
   });
-
 });
 
 async function GetLinkedinDataFromCompany(entreprise){
