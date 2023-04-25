@@ -4,7 +4,8 @@ import { Client } from "linkedin-private-api";
 // import fs from 'fs';
 // import { join } from 'path';
 import express from 'express';
-import http from "http"
+import http from "http";
+import compression from "compression"
 
 //make the server and the socketsio
 
@@ -17,6 +18,7 @@ const io = new Server(server);
 //server static file in the public directory
 // app.use(express.static(join(".", '../client/build')));
 app.use(express.static('./client/build'));
+app.use(compression());
 
 //Var & Const
 let timerInt
