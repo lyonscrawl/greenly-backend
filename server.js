@@ -16,7 +16,7 @@ import { Server } from "socket.io";
 const io = new Server(server);
 
 //server static file in the public directory
-// app.use(express.static(join(".", '../client/build')));
+// app.use(express.static(join(".", '../client/build'))); 
 app.use(express.static('./client/build'));
 app.use(compression());
 
