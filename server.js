@@ -19743,8 +19743,8 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
                     && 
                     !(jobs.icpno.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) &&
                     (
-                      (jobs.icp1.some(x => user.profile.occupation.toLowerCase().includes(x)) === true || jobs.icp2.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) ||
-                      (jobs.icp3.some(x => user.profile.occupation.toLowerCase().includes(x)) === true || jobs.icp4.some(x => user.profile.occupation.toLowerCase().includes(x)) === true)
+                      (jobs.icp1.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp2.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) ||
+                      (jobs.icp3.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp4.some(x => user.profile.occupation.toLowerCase().includes(x)) === true)
                     )
                   ){
                     result.push({
@@ -19782,8 +19782,8 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
                   && 
                   !(jobs.icpno.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) &&
                   (
-                    (jobs.icp1.some(x => user.profile.occupation.toLowerCase().includes(x)) === true || jobs.icp2.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) ||
-                    (jobs.icp3.some(x => user.profile.occupation.toLowerCase().includes(x)) === true || jobs.icp4.some(x => user.profile.occupation.toLowerCase().includes(x)) === true)
+                    (jobs.icp1.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp2.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) ||
+                    (jobs.icp3.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp4.some(x => user.profile.occupation.toLowerCase().includes(x)) === true)
                   )
                 ){
                     result.push({
@@ -19821,8 +19821,8 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
                   && 
                   !(jobs.icpno.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) &&
                   (
-                    (jobs.icp1.some(x => user.profile.occupation.toLowerCase().includes(x)) === true || jobs.icp2.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) ||
-                    (jobs.icp3.some(x => user.profile.occupation.toLowerCase().includes(x)) === true || jobs.icp4.some(x => user.profile.occupation.toLowerCase().includes(x)) === true)
+                    (jobs.icp1.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp2.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) ||
+                    (jobs.icp3.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp4.some(x => user.profile.occupation.toLowerCase().includes(x)) === true)
                   )
                 ){
                       result.push({
@@ -19861,8 +19861,8 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
                     && 
                     !(jobs.icpno.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) &&
                     (
-                      (jobs.icp1.some(x => user.profile.occupation.toLowerCase().includes(x)) === true || jobs.icp2.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) ||
-                      (jobs.icp3.some(x => user.profile.occupation.toLowerCase().includes(x)) === true || jobs.icp4.some(x => user.profile.occupation.toLowerCase().includes(x)) === true)
+                      (jobs.icp1.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp2.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) ||
+                      (jobs.icp3.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp4.some(x => user.profile.occupation.toLowerCase().includes(x)) === true)
                     )
                   ){
                     // console.log(dataURL[dataIndex]["Entreprise"])
