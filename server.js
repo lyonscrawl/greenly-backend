@@ -19687,6 +19687,14 @@ io.on('connection', function (socket) {
         }
     }, 10 * 1000) // 10sec
   });
+  socket.on("stop_scrap", function (selectedOption) {
+    console.log('stop_scrap')
+    io.emit("scrap_end", deb);
+    clearInterval(timerInt)
+    deb = 0
+    inc = deb + 1
+    result = [];
+  });
 });
 
 async function GetLinkedinDataFromCompany(entreprise){
@@ -19739,17 +19747,17 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
                       (jobs.icp3.some(x => user.profile.occupation.toLowerCase().includes(x)) === true || jobs.icp4.some(x => user.profile.occupation.toLowerCase().includes(x)) === true)
                     )
                   ){
-                      result.push({
-                          "isNew": "yes",
-                          "Entreprise": dataURL[dataIndex]["Entreprise"],
-                          "Prenom": user.profile.firstName,
-                          "Nom": user.profile.lastName,
-                          "Poste": user.profile.occupation,
-                          "URL Profil Linkedin": user.navigationUrl,
-                          "Domaine Web Entreprise": "",
-                          "Email": "",
-                          "Telephone": ""
-                      })
+                    result.push({
+                        "isNew": "yes",
+                        "Entreprise": dataURL[dataIndex]["Entreprise"],
+                        "Prenom": user.profile.firstName,
+                        "Nom": user.profile.lastName,
+                        "Poste": user.profile.occupation,
+                        "URL Profil Linkedin": user.navigationUrl,
+                        "Domaine Web Entreprise": "",
+                        "Email": "",
+                        "Telephone": ""
+                    })
                   }
               })
               //Show to the table
