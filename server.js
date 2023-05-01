@@ -24,17 +24,22 @@ app.use(compression());
 let timerInt
 let deb = 0
 let inc = deb + 1
+const mod_leads = 100
+const mod_comp = 10
 
 let result = []
 const options = ["SBTI", "CDP", "Ecovadis", "B-Corp"];
 const jobs = {
   "icp1": ["directeur", "directrice", "director", "head of", "project manager", "chargé", "chargée", "chef de Projet", "cheffe de Projet", "coordinateur", "responsable", "coordinatrice", "coordinator", "chief", "manager", "partner", "analyste"],
-  "icp2": ["rse", "qse", "hse", "qhse", "environnement", "développement durable", "sustainability", "esg", "isr", "csr", "impact", "impact", "climat", "climate", "numérique responsable", "bas-carbone"],
+  "icp2": ["rse", "qse", "hse", "qhse", "environnement", "développement durable", "sustainability", "esg", "isr", "csr", "impact", "climat", "climate", "numérique responsable", "bas-carbone"],
   // OR
   "icp3": ["directeur", "directrice", "director", "chief", "head of"],
   "icp4": ["opérations", "operations", "achats", "procurement", "achats responsables", "quality", "stratégie", "finance", "qualité", "conformité"],
   // NOT
-  "icpno": ["sales", "commercial", "adjoint", "assistant", "stagiaire", "consultant", "freelance", "r&d", "si", "it", "administrateur", "business", "fresque", "advisor"],
+  "icpno": ["sales", "commercial", "adjoint", "assistant", "stagiaire", "consultant", "freelance", "r&d", "si", "it", "administrateur", "business", "fresque", "advisor", "hr", "recruitment"],
+}
+const locs = {
+  "fr": ["france", "paris", "toulouse", "lyon"],
 }
 const dataURL = [
   [
@@ -19677,27 +19682,42 @@ io.on('connection', function (socket) {
     timerInt = setInterval(()=>{
         console.log('get_scrap_timer_int')
         if(selectedOption === options[0]){
-          scrapAllURL(selectedOption, dataURL[0], 0, deb, inc)
+          scrapAllURL(selectedOption, dataURL[0], 0)
         } else if(selectedOption === options[1]){
-          scrapAllURL(selectedOption, dataURL[1], 1, deb, inc)
+          scrapAllURL(selectedOption, dataURL[1], 1)
         } else if(selectedOption === options[2]){
-          scrapAllURL(selectedOption, dataURL[2], 2, deb, inc)
+          scrapAllURL(selectedOption, dataURL[2], 2)
         } else if(selectedOption === options[3]){
-          scrapAllURL(selectedOption, dataURL[3], 3, deb, inc)
+          scrapAllURL(selectedOption, dataURL[3], 3)
+        }
+    }, 10 * 1000) // 10sec
+  });
+  socket.on("get_comp_scrap", function (selectedOption) {
+    console.log('get_comp_scrap')
+    timerInt = setInterval(()=>{
+        console.log('get_scrap_timer_int')
+        if(selectedOption === options[0]){
+          scrapAllCompaniesURL(selectedOption, dataURL[0], 0)
+        } else if(selectedOption === options[1]){
+          scrapAllCompaniesURL(selectedOption, dataURL[1], 1)
+        } else if(selectedOption === options[2]){
+          scrapAllCompaniesURL(selectedOption, dataURL[2], 2)
+        } else if(selectedOption === options[3]){
+          scrapAllCompaniesURL(selectedOption, dataURL[3], 3)
         }
     }, 10 * 1000) // 10sec
   });
   socket.on("stop_scrap", function (selectedOption) {
     console.log('stop_scrap')
-    io.emit("scrap_end", deb);
+    io.emit("scrap_result", result);
+    io.emit("scrap_end", result);
     clearInterval(timerInt)
     deb = 0
     inc = deb + 1
     result = [];
   });
 });
-
-async function GetLinkedinDataFromCompany(entreprise){
+async function GetLinkedinDataFromCompany(entreprise, val){
     // Login
     const client = new Client();
     try {
@@ -19706,26 +19726,63 @@ async function GetLinkedinDataFromCompany(entreprise){
         console.log(error)
     }
     let users = []
-    let company = ""
+    let company = []
     try {
         // Fetch the job's company
         const companiesScroller = client.search.searchCompanies({
-          filters: { company: entreprise, },
+          keywords: entreprise,
           limit: 1,
         })
-        company = await companiesScroller.scrollNext()
-        // console.log("=======> ",company)
-        const peopleScroller = client.search.searchPeople({
-            filters: { company: entreprise },
-            limit: 50,
-        })
-        users = await peopleScroller.scrollNext();
+        // (type%3ATITLE%2Cvalues
+        // List((text%3A%2528%25E2%2580%2599Directeur%25E2%2580%2599%2520OR%2520%25E2%2580%2598Directrice%25E2%2580%2599%2520OR%2520%25E2%2580%2598Director%25E2%2580%2599%2520OR%2520%25E2%2580%2598Head%2520of%25E2%2580%2599%2520OR%2520%25E2%2580%2598Project%2520Manager%25E2%2580%2599%2520OR%2520%25E2%2580%2598Charg%25C3%25A9%25E2%2580%2599%2520OR%2520%25E2%2580%2598Charg%25C3%25A9e%25E2%2580%2599%2520OR%2520%25E2%2580%2598Chef%2520de%2520Projet%25E2%2580%2599%2520OR%2520%25E2%2580%2598Cheffe%2520de%2520Projet%25E2%2580%2599%2520OR%2520%25E2%2580%2598Coordinateur%25E2%2580%2599%2520OR%2520%2527Responsable%2527%2520OR%2520%2527Coordinatrice%2527%2520OR%2520%25E2%2580%2598Coordinator%25E2%2580%2599%2520OR%2520%25E2%2580%2598Chief%25E2%2580%2599%2520OR%2520%25E2%2580%2598Manager%25E2%2580%2599%2520OR%2520%25E2%2580%2598Partner%25E2%2580%2599%2520OR%2520%25E2%2580%2598Analyste%25E2%2580%2599%2529%2520AND%2520%2528%2527RSE%2527%2520OR%2520%2520%25E2%2580%2598QSE%25E2%2580%2599%2520OR%2520%25E2%2580%2598HSE%25E2%2580%2599%2520OR%2520%25E2%2580%2598QHSE%25E2%2580%2599%2520OR%2520%25E2%2580%2598Environnement%25E2%2580%2599%2520OR%2520%25E2%2580%2598D%25C3%25A9veloppement%2520Durable%25E2%2580%2599%2520OR%2520%25E2%2580%2598Sustainability%25E2%2580%2599%2520OR%2520%25E2%2580%2598ESG%25E2%2580%2599%2520OR%2520%25E2%2580%2598ISR%25E2%2580%2599%2520OR%2520%25E2%2580%2598CSR%25E2%2580%2599%2520OR%2520%25E2%2580%2598Impact%25E2%2580%2599%2520OR%2520%25E2%2580%2598Impact%25E2%2580%2599%2520OR%2520%25E2%2580%2598Climat%25E2%2580%2599%2520OR%2520%25E2%2580%2598Climate%25E2%2580%2599%2520OR%2520%25E2%2580%2598Num%25C3%25A9rique%2520Responsable%25E2%2580%2599%2520OR%2520%25E2%2580%2598Bas-carbone%25E2%2580%2599%2529%2520OR%2520%2528%25E2%2580%2599Directeur%25E2%2580%2599%2520OR%2520%25E2%2580%2598Directrice%25E2%2580%2599%2520OR%2520%25E2%2580%2598Director%25E2%2580%2599%2520OR%2520%25E2%2580%2598Chief%25E2%2580%2599%2520OR%2520%25E2%2580%2598Head%2520of%25E2%2580%2599%2529%2520AND%2520%2528%25E2%2580%2599Op%25C3%25A9rations%25E2%2580%2599%2520OR%2520%25E2%2580%2598Operations%25E2%2580%2599%2520OR%2520%25E2%2580%2598Achats%25E2%2580%2599%2520OR%2520%25E2%2580%2598Procurement%25E2%2580%2599%2520OR%2520%25E2%2580%2598Achats%2520Responsables%25E2%2580%2599%2520OR%2520%25E2%2580%2598Qualit%25C3%25A9%25E2%2580%2599%2520OR%2520%25E2%2580%2598Strat%25C3%25A9gie%25E2%2580%2599%2520OR%2520%25E2%2580%2598Finance%25E2%2580%2599%2520OR%2520%25E2%2580%2598Qualit%25C3%25A9%25E2%2580%2599%2520OR%2520%25E2%2580%2598Conformit%25C3%25A9%25E2%2580%2599%2529%2520NOT%2520%2528%25E2%2580%2598Sales%25E2%2580%2599%2520OR%2520%25E2%2580%2598Commercial%25E2%2580%2599%2520OR%2520%25E2%2580%2598Adjoint%25E2%2580%2599%2520OR%2520%25E2%2580%2598Assistant%25E2%2580%2599%2520OR%2520%25E2%2580%2598Stagiaire%25E2%2580%2599%2520OR%2520%25E2%2580%2598Consultant%25E2%2580%2599%2520OR%2520%25E2%2580%2598Talent%25E2%2580%2599%2520OR%2520%25E2%2580%2598Lecturer%25E2%2580%2599%2520OR%2520%25E2%2580%2598Freelance%25E2%2580%2599%2520OR%2520%25E2%2580%2598R%2526D%25E2%2580%2599%2520OR%2520%25E2%2580%2598SI%25E2%2580%2599%2520OR%2520%25E2%2580%2598IT%25E2%2580%2599%2520OR%2520%25E2%2580%2598Administrateur%25E2%2580%2599%2520OR%2520%25E2%2580%2598Business%25E2%2580%2599%2520OR%2520%25E2%2580%2598Fresque%25E2%2580%2599%2520OR%2520%25E2%2580%2598Advisor%25E2%2580%2599%2520OR%2520%25E2%2580%2598S%25C3%25A9curit%25C3%25A9%25E2%2580%2599%2520Or%2520%25E2%2580%2598Investor%25E2%2580%2599%2529%2520OR%2520%2528%25E2%2580%2599CEO%25E2%2580%2599%2520OR%2520%25E2%2580%2598PDG%25E2%2580%2599%2520OR%2520%25E2%2580%2598Directeur%2520G%25C3%25A9n%25C3%25A9ral%25E2%2580%2599%2520OR%2520%25E2%2580%2598Co-founder%25E2%2580%2599%2520OR%2520%25E2%2580%2598Chief%2520of%2520Staff%25E2%2580%2599%2520OR%2520%25E2%2580%2598Partner%25E2%2580%2599%2520OR%2520%25E2%2580%2598COO%25E2%2580%2599%2520OR%2520%25E2%2580%2598CMO%25E2%2580%2599%2529%2520OR%2520%2528%25E2%2580%2599Directeur%25E2%2580%2599%2520OR%2520%25E2%2580%2598Directrice%25E2%2580%2599%2520OR%2520%25E2%2580%2598Director%25E2%2580%2599%2520OR%2520%25E2%2580%2598Chief%25E2%2580%2599%2520OR%2520%25E2%2580%2598Head%2520of%25E2%2580%2599%2529%2520AND%2520%2528%25E2%2580%2599Op%25C3%25A9rations%25E2%2580%2599%2520OR%2520%25E2%2580%2598Operations%25E2%2580%2599%2520OR%2520%25E2%2580%2598Achats%25E2%2580%2599%2520OR%2520%25E2%2580%2598Procurement%25E2%2580%2599%2520OR%2520%25E2%2580%2598Achats%2520Responsables%25E2%2580%2599%2520OR%2520%25E2%2580%2598Qualit%25C3%25A9%25E2%2580%2599%2520OR%2520%25E2%2580%2598Marketing%25E2%2580%2599%2520OR%2520%25E2%2580%2598Communication%25E2%2580%2599%2520OR%2520%25E2%2580%2598Strat%25C3%25A9gie%25E2%2580%2599%2520OR%2520%25E2%2580%2598Finance%25E2%2580%2599%2520OR%2520%25E2%2580%2598Qualit%25C3%25A9%25E2%2580%2599%2520OR%2520%25E2%2580%2598Conformit%25C3%25A9%25E2%2580%2599%2529%2520NOT%2520%2528%25E2%2580%2598Sales%25E2%2580%2599%2520OR%2520%25E2%2580%2598Commercial%25E2%2580%2599%2520OR%2520%25E2%2580%2598Adjoint%25E2%2580%2599%2520OR%2520%25E2%2580%2598Assistant%25E2%2580%2599%2520OR%2520%25E2%2580%2598Stagiaire%25E2%2580%2599%2520OR%2520%25E2%2580%2598Consultant%25E2%2580%2599%2520OR%2520%25E2%2580%2598Freelance%25E2%2580%2599%2520OR%2520%25E2%2580%2598R%2526D%25E2%2580%2599%2520OR%2520%25E2%2580%2598DSI%25E2%2580%2599%2520OR%2520%25E2%2580%2598SI%25E2%2580%2599%2520OR%2520%25E2%2580%2598IT%25E2%2580%2599%2520OR%2520%25E2%2580%2598Administrateur%25E2%2580%2599%2520OR%2520%25E2%2580%2598Business%2520Partner%25E2%2580%2599%2529%2CselectionType%3AINCLUDED))
+        //'Directeur OR Directrice OR Director OR Head of OR Project Manager OR Chargé OR Chargée OR Chef de Projet OR Cheffe de Projet OR Coordinateur OR Responsable OR Coordinatrice OR Coordinator OR Chief OR Manager OR Partner OR Analyste'
+        company = await companiesScroller.fetch()
+        if(company.length <= 0 || company[0] === undefined || company[0].title || company[0].headline === undefined || company[0].subline === undefined || company[0].company === undefined || company[0].subline.text === undefined){
+          // console.log(company[0].subline.text.split(" ")[0].split("-")[0].replace(",",""), parseInt(company[0].subline.text.split(" ")[0].split("-")[0].replace(",","")))
+          if(
+            company[0].subline.text.split(" ")[0].split("-")[0].length <= 1 || 
+            parseInt(company[0].subline.text.split(" ")[0].split("-")[0].replace(",","")) === NaN  || 
+            parseInt(company[0].subline.text.split(" ")[0].split("-")[0].replace(",","")) <= 50 
+          ){
+            company = []
+          } else {
+            // console.log("=======> ",company[0])
+            if(val === true){
+              const peopleScroller = client.search.searchPeople({
+                filters: { company: entreprise, title: "Procurement Director OR Head of QSE OR HSE Manager OR ESG Manager OR Sustainable Manager" /*industry: company[0].headline.text , geoUrn: location */ },
+                keywords: entreprise,
+                limit: 50,
+              })
+              users = await peopleScroller.fetch()
+            } 
+            // else {
+            //   const peopleScroller = client.search.searchPeople({
+            //     filters: { company: entreprise /*industry: company[0].headline.text , geoUrn: location */ },
+            //     keywords: entreprise,
+            //     limit: 1,
+            //   })
+            //   users = await peopleScroller.fetch()
+            // }
+          }
+        }
     } catch (error) {
-        console.log("===>erreur")
+        console.log("==>> erreur")
         users = []
+        company = []
     }
+    // console.log("=>>>>", company)
+    // let tmp = company[0].subline.text.split(" ")[0].split("-")[0].length
+    // console.log("==>>>", tmp)
     return {
-      "EntrepriseURL": company,
+      // Nom: .title.text - Industry: .headline.text - size: .subline.text - https://www.linkedin.com/company/ + .company.companyId
+      "Company": {
+        "nom": (company.length <= 0 || company[0].title === undefined || company[0].title.text === undefined) ? "" : company[0].title.text,
+        "industry" : (company.length <= 0 || company[0].headline === undefined || company[0].headline.text === undefined) ? "" :company[0].headline.text,
+        "size" : (company.length <= 0 || company[0].subline === undefined || company[0].subline.text === undefined) ? "" :company[0].subline.text,
+        // "loc" : (users.length <= 0 || users[0].subline === undefined || users[0].subline.text === undefined) ? "" : users[0].subline.text,
+        "loc" : "",
+        "url_linkedin" : (company.length <= 0 || company[0].company === undefined || company[0].company.companyId === undefined) ? "" : ("https://www.linkedin.com/company/" + company[0].company.companyId)
+      },
       "Users": users
     }
 }
@@ -19733,35 +19790,43 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
   switch(dataURLIndex){
     case 0: {
       //Get Linkedin Datas
-      let lnData = await GetLinkedinDataFromCompany(dataURL[dataIndex]["Entreprise"])
+      let lnData = await GetLinkedinDataFromCompany(dataURL[dataIndex]["Entreprise"], true)
       let users = lnData["Users"]
+      let company = lnData["Company"]
       try {
           if (!(users === undefined || users === "" || users === null || users.length === 0)){
               users.forEach((user)=>{
                   if(
-                    !(user.profile.firstName === undefined || user.profile.firstName === "" || user.profile.firstName === null)
-                    && 
-                    !(jobs.icpno.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) &&
-                    (
-                      (jobs.icp1.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp2.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) ||
-                      (jobs.icp3.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp4.some(x => user.profile.occupation.toLowerCase().includes(x)) === true)
-                    )
+                    !(user.profile.firstName === undefined || user.profile.firstName === "" || user.profile.firstName === null  || company.size === "")
+                    // &&
+                    // !(jobs.icpno.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) 
+                    // &&
+                    // (
+                    //   (jobs.icp1.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp2.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) ||
+                    //   (jobs.icp3.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp4.some(x => user.profile.occupation.toLowerCase().includes(x)) === true)
+                    // )
                   ){
+                    // console.log(user)
                     result.push({
+                        "URL": options[dataURLIndex],
                         "isNew": "yes",
                         "Entreprise": dataURL[dataIndex]["Entreprise"],
+                        "Localisation": /*(locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? "France" :*/ user.subline.text,
+                        "Industrie": company.industry,
+                        "Taille": company.size,
+                        "URL Linkedin": company.url_linkedin,
                         "Prenom": user.profile.firstName,
                         "Nom": user.profile.lastName,
                         "Poste": user.profile.occupation,
-                        "URL Profil Linkedin": user.navigationUrl,
-                        "Domaine Web Entreprise": "",
+                        "Profil Linkedin": user.navigationUrl,
+                        "Domaine Web": "",
                         "Email": "",
                         "Telephone": ""
                     })
                   }
               })
               //Show to the table
-              io.emit("scrap_result", result);
+              if(result.length % mod_leads === 0) io.emit("scrap_result", result);
               // result = [];
           }
       } catch (error) {
@@ -19772,35 +19837,41 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
     case 1: {
       console.log(dataURL[dataIndex]["Entreprise"], dataURLIndex, dataIndex, url)
       //Get Linkedin Datas
-      let lnData = await GetLinkedinDataFromCompany(dataURL[dataIndex]["Entreprise"])
+      let lnData = await GetLinkedinDataFromCompany(dataURL[dataIndex]["Entreprise"], true)
       let users = lnData["Users"]
+      let company = lnData["Company"]
       try {
           if (!(users === undefined || users === "" || users === null || users.length === 0)){
               users.forEach((user)=>{
                 if(
-                  !(user.profile.firstName === undefined || user.profile.firstName === "" || user.profile.firstName === null)
-                  && 
-                  !(jobs.icpno.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) &&
-                  (
-                    (jobs.icp1.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp2.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) ||
-                    (jobs.icp3.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp4.some(x => user.profile.occupation.toLowerCase().includes(x)) === true)
-                  )
+                  !(user.profile.firstName === undefined || user.profile.firstName === "" || user.profile.firstName === null  || company.size === "")
+                  // && 
+                  // !(jobs.icpno.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) &&
+                  // (
+                  //   (jobs.icp1.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp2.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) ||
+                  //   (jobs.icp3.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp4.some(x => user.profile.occupation.toLowerCase().includes(x)) === true)
+                  // )
                 ){
                     result.push({
+                        "URL": options[dataURLIndex],
                         "isNew": "yes",
                         "Entreprise": dataURL[dataIndex]["Entreprise"],
+                        "Localisation": /*(locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? "France" :*/ user.subline.text,
+                        "Industrie": company.industry,
+                        "Taille": company.size,
+                        "URL Linkedin": company.url_linkedin,
                         "Prenom": user.profile.firstName,
                         "Nom": user.profile.lastName,
                         "Poste": user.profile.occupation,
-                        "URL Profil Linkedin": user.navigationUrl,
-                        "Domaine Web Entreprise": "",
+                        "Profil Linkedin": user.navigationUrl,
+                        "Domaine Web": "",
                         "Email": "",
                         "Telephone": ""
                     })
                   }
               })
               //Show to the table
-              io.emit("scrap_result", result);
+              if(result.length % mod_leads === 0) io.emit("scrap_result", result);
               // result = [];
           }
       } catch (error) {
@@ -19811,35 +19882,41 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
     case 2: {
       console.log(dataURL[dataIndex]["Entreprise"], dataURLIndex, dataIndex, url)
       //Get Linkedin Datas
-      let lnData = await GetLinkedinDataFromCompany(dataURL[dataIndex]["Entreprise"])
+      let lnData = await GetLinkedinDataFromCompany(dataURL[dataIndex]["Entreprise"], true)
       let users = lnData["Users"]
+      let company = lnData["Company"]
       try {
           if (!(users === undefined || users === "" || users === null || users.length === 0)){
               users.forEach((user)=>{
                 if(
-                  !(user.profile.firstName === undefined || user.profile.firstName === "" || user.profile.firstName === null)
-                  && 
-                  !(jobs.icpno.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) &&
-                  (
-                    (jobs.icp1.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp2.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) ||
-                    (jobs.icp3.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp4.some(x => user.profile.occupation.toLowerCase().includes(x)) === true)
-                  )
+                  !(user.profile.firstName === undefined || user.profile.firstName === "" || user.profile.firstName === null  || company.size === "")
+                  // && 
+                  // !(jobs.icpno.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) &&
+                  // (
+                  //   (jobs.icp1.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp2.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) ||
+                  //   (jobs.icp3.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp4.some(x => user.profile.occupation.toLowerCase().includes(x)) === true)
+                  // )
                 ){
                       result.push({
+                          "URL": options[dataURLIndex],
                           "isNew": "yes",
                           "Entreprise": dataURL[dataIndex]["Entreprise"],
+                          "Localisation": /*(locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? "France" :*/ user.subline.text,
+                          "Industrie": company.industry,
+                          "Taille": company.size,
+                          "URL Linkedin": company.url_linkedin,
                           "Prenom": user.profile.firstName,
                           "Nom": user.profile.lastName,
                           "Poste": user.profile.occupation,
-                          "URL Profil Linkedin": user.navigationUrl,
-                          "Domaine Web Entreprise": "",
+                          "Profil Linkedin": user.navigationUrl,
+                          "Domaine Web": "",
                           "Email": "",
                           "Telephone": ""
                       })
                   }
               })
               //Show to the table
-              io.emit("scrap_result", result);
+              if(result.length % mod_leads === 0) io.emit("scrap_result", result);
               // result = [];
           }
       } catch (error) {
@@ -19851,36 +19928,42 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
       const $ = load(html)
       $('.break-words .opacity-60 a', html).each(async(index, el) => {
         //Get Linkedin Datas
-        let lnData = await GetLinkedinDataFromCompany(dataURL[dataIndex]["Entreprise"])
+        let lnData = await GetLinkedinDataFromCompany(dataURL[dataIndex]["Entreprise"], true)
         let users = lnData["Users"]
+        let company = lnData["Company"]
         try {
             if (!(users === undefined || users === "" || users === null || users.length === 0)){
                 users.forEach((user)=>{
                   if(
-                    !(user.profile.firstName === undefined || user.profile.firstName === "" || user.profile.firstName === null)
-                    && 
-                    !(jobs.icpno.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) &&
-                    (
-                      (jobs.icp1.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp2.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) ||
-                      (jobs.icp3.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp4.some(x => user.profile.occupation.toLowerCase().includes(x)) === true)
-                    )
+                    !(user.profile.firstName === undefined || user.profile.firstName === "" || user.profile.firstName === null  || company.size === "")
+                    // && 
+                    // !(jobs.icpno.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) &&
+                    // (
+                    //   (jobs.icp1.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp2.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) ||
+                    //   (jobs.icp3.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp4.some(x => user.profile.occupation.toLowerCase().includes(x)) === true)
+                    // )
                   ){
                     // console.log(dataURL[dataIndex]["Entreprise"])
                       result.push({
+                          "URL": options[dataURLIndex],
                           "isNew": "yes",
                           "Entreprise": dataURL[dataIndex]["Entreprise"],
+                          "Localisation": /*(locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? "France" :*/ user.subline.text,
+                          "Industrie": company.industry,
+                          "Taille": company.size,
+                          "URL Linkedin": company.url_linkedin,
                           "Prenom": user.profile.firstName,
                           "Nom": user.profile.lastName,
                           "Poste": user.profile.occupation,
-                          "URL Profil Linkedin": user.navigationUrl,
-                          "Domaine Web Entreprise": $(el).attr("href"),
+                          "Profil Linkedin": user.navigationUrl,
+                          "Domaine Web": $(el).attr("href"),
                           "Email": "",
                           "Telephone": ""
                       })
                     }
                 })
                 //Show to the table
-                io.emit("scrap_result", result);
+                if(result.length % mod_leads === 0) io.emit("scrap_result", result);
                 // result = [];
             }
         } catch (error) {
@@ -19901,9 +19984,10 @@ async function firstScrapData(dataURL,dataURLIndex, url, index){
         console.error(error)
     }
 }
-function scrapAllURL(selectedOption, dataURL, dataURLIndex, debHere, incHere){
+function scrapAllURL(selectedOption, dataURL, dataURLIndex){
     if(deb === dataURL.length) {
-      io.emit("scrap_end", deb);
+      io.emit("scrap_result", result);
+      io.emit("scrap_end", result);
       clearInterval(timerInt)
       deb = 0
       inc = deb + 1
@@ -19923,6 +20007,43 @@ function scrapAllURL(selectedOption, dataURL, dataURLIndex, debHere, incHere){
       deb = inc
       inc = ( (inc+1) >= dataURL.length) ? dataURL.length : (inc+1)
     }
+}
+async function scrapAllCompaniesURL(selectedOption, dataURL, dataURLIndex){
+  if(deb === dataURL.length) {
+    io.emit("scrap_result", result);
+    io.emit("scrap_end", result);
+    clearInterval(timerInt)
+    deb = 0
+    inc = deb + 1
+    result = [];
+  } else {
+    // console.log("===>", deb, dataURL[deb]["Entreprise"])
+    let lnData = await GetLinkedinDataFromCompany(dataURL[deb]["Entreprise"], false)
+    let company = lnData["Company"]
+    if(company.size !== ""){
+      result.push({
+        "URL": selectedOption,
+        "isNew": "yes",
+        "Entreprise": dataURL[deb]["Entreprise"],
+        "Localisation": company.loc,
+        "Industrie": company.industry,
+        "Taille": company.size,
+        "URL Linkedin": company.url_linkedin,
+        "Prenom": "",
+        "Nom": "",
+        "Poste": "",
+        "Profil Linkedin": "",
+        "Domaine Web": "",
+        "Email": "",
+        "Telephone": ""
+      })
+    }
+    //Show to the table
+    if(result.length % mod_comp === 0) io.emit("scrap_result", result);
+
+    deb = inc
+    inc = ( (inc+1) >= dataURL.length) ? dataURL.length : (inc+1)
+  }
 }
 
 const port = 8080 //process.env.PORT;
