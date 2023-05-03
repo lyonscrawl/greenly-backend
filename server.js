@@ -19826,7 +19826,7 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
                   }
               })
               //Show to the table
-              if(result.length % mod_leads === 0) io.emit("scrap_result", result);
+              // if(result.length % mod_leads === 0) io.emit("scrap_result", result);
               // result = [];
           }
       } catch (error) {
@@ -19871,7 +19871,7 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
                   }
               })
               //Show to the table
-              if(result.length % mod_leads === 0) io.emit("scrap_result", result);
+              // if(result.length % mod_leads === 0) io.emit("scrap_result", result);
               // result = [];
           }
       } catch (error) {
@@ -19916,7 +19916,7 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
                   }
               })
               //Show to the table
-              if(result.length % mod_leads === 0) io.emit("scrap_result", result);
+              // if(result.length % mod_leads === 0) io.emit("scrap_result", result);
               // result = [];
           }
       } catch (error) {
@@ -19963,7 +19963,7 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
                     }
                 })
                 //Show to the table
-                if(result.length % mod_leads === 0) io.emit("scrap_result", result);
+                // if(result.length % mod_leads === 0) io.emit("scrap_result", result);
                 // result = [];
             }
         } catch (error) {
@@ -20039,7 +20039,7 @@ async function scrapAllCompaniesURL(selectedOption, dataURL, dataURLIndex){
       })
     }
     //Show to the table
-    if(result.length % mod_comp === 0) io.emit("scrap_result", result);
+    // if(result.length % mod_comp === 0) io.emit("scrap_result", result);
 
     deb = inc
     inc = ( (inc+1) >= dataURL.length) ? dataURL.length : (inc+1)
