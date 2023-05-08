@@ -24,11 +24,11 @@ app.use(compression());
 let timerInt
 let deb = 0
 let inc = deb + 1
-const mod_leads = 100
-const mod_comp = 10
+const mod_leads = 1
+const mod_comp = 1
 
 let result = []
-const options = ["SBTI", "CDP", "Ecovadis", "B-Corp"];
+const options = ["SBTI", "CDP", "Ecovadis", "B-Corp", "Test 5 of SBTI"];
 const jobs = {
   "icp1": ["directeur", "directrice", "director", "head of", "project manager", "chargé", "chargée", "chef de Projet", "cheffe de Projet", "coordinateur", "responsable", "coordinatrice", "coordinator", "chief", "manager", "partner", "analyste"],
   "icp2": ["rse", "qse", "hse", "qhse", "environnement", "développement durable", "sustainability", "esg", "isr", "csr", "impact", "climat", "climate", "numérique responsable", "bas-carbone"],
@@ -19671,7 +19671,25 @@ const dataURL = [
       "FisrtURL": "https://www.bcorporation.net/en-us/find-a-b-corp/company/kit-and-kin-ltd",
       "Entreprise": "Kit and Kin Ltd"
     }
-  ]
+  ],
+  [
+    // TEST
+    {
+      "Entreprise": "2 Sisters Food Group"
+    },
+    {
+      "Entreprise": "24 Ltd"
+    },
+    {
+      "Entreprise": "2degrees"
+    },
+    {
+      "Entreprise": "3B-Fibreglass"
+    },
+    {
+      "Entreprise": "3i Group plc"
+    },
+  ],
 ]
 
 // Quand un client se connecte, on le note dans la console
@@ -19680,7 +19698,7 @@ io.on('connection', function (socket) {
   socket.on("get_scrap", function (selectedOption) {
     console.log('get_scrap')
     timerInt = setInterval(()=>{
-        console.log('get_scrap_timer_int')
+        // console.log('get_scrap_timer_int')
         if(selectedOption === options[0]){
           scrapAllURL(selectedOption, dataURL[0], 0)
         } else if(selectedOption === options[1]){
@@ -19689,13 +19707,15 @@ io.on('connection', function (socket) {
           scrapAllURL(selectedOption, dataURL[2], 2)
         } else if(selectedOption === options[3]){
           scrapAllURL(selectedOption, dataURL[3], 3)
+        } else {
+          scrapAllURL(selectedOption, dataURL[4], 4)
         }
     }, 10 * 1000) // 10sec
   });
   socket.on("get_comp_scrap", function (selectedOption) {
     console.log('get_comp_scrap')
     timerInt = setInterval(()=>{
-        console.log('get_scrap_timer_int')
+        // console.log('get_scrap_timer_int')
         if(selectedOption === options[0]){
           scrapAllCompaniesURL(selectedOption, dataURL[0], 0)
         } else if(selectedOption === options[1]){
@@ -19704,12 +19724,14 @@ io.on('connection', function (socket) {
           scrapAllCompaniesURL(selectedOption, dataURL[2], 2)
         } else if(selectedOption === options[3]){
           scrapAllCompaniesURL(selectedOption, dataURL[3], 3)
+        } else {
+          scrapAllCompaniesURL(selectedOption, dataURL[4], 4)
         }
     }, 10 * 1000) // 10sec
   });
   socket.on("stop_scrap", function (selectedOption) {
     console.log('stop_scrap')
-    io.emit("scrap_result", result);
+    // io.emit("scrap_result", result);
     io.emit("scrap_end", result);
     clearInterval(timerInt)
     deb = 0
@@ -19789,6 +19811,7 @@ async function GetLinkedinDataFromCompany(entreprise, val){
 async function getData(dataURL, dataURLIndex, dataIndex, html, url){
   switch(dataURLIndex){
     case 0: {
+      console.log("===>", deb, dataURL[deb]["Entreprise"])
       //Get Linkedin Datas
       let lnData = await GetLinkedinDataFromCompany(dataURL[dataIndex]["Entreprise"], true)
       let users = lnData["Users"]
@@ -19826,7 +19849,7 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
                   }
               })
               //Show to the table
-              // if(result.length % mod_leads === 0) io.emit("scrap_result", result);
+              if(result.length % mod_leads === 0) io.emit("scrap_result", result);
               // result = [];
           }
       } catch (error) {
@@ -19835,7 +19858,7 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
       break;
     }
     case 1: {
-      console.log(dataURL[dataIndex]["Entreprise"], dataURLIndex, dataIndex, url)
+      console.log("===>", deb, dataURL[deb]["Entreprise"])
       //Get Linkedin Datas
       let lnData = await GetLinkedinDataFromCompany(dataURL[dataIndex]["Entreprise"], true)
       let users = lnData["Users"]
@@ -19871,7 +19894,7 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
                   }
               })
               //Show to the table
-              // if(result.length % mod_leads === 0) io.emit("scrap_result", result);
+              if(result.length % mod_leads === 0) io.emit("scrap_result", result);
               // result = [];
           }
       } catch (error) {
@@ -19880,53 +19903,59 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
       break;
     }
     case 2: {
-      console.log(dataURL[dataIndex]["Entreprise"], dataURLIndex, dataIndex, url)
-      //Get Linkedin Datas
-      let lnData = await GetLinkedinDataFromCompany(dataURL[dataIndex]["Entreprise"], true)
-      let users = lnData["Users"]
-      let company = lnData["Company"]
-      try {
-          if (!(users === undefined || users === "" || users === null || users.length === 0)){
-              users.forEach((user)=>{
-                if(
-                  !(user.profile.firstName === undefined || user.profile.firstName === "" || user.profile.firstName === null  || company.size === "")
-                  // && 
-                  // !(jobs.icpno.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) &&
-                  // (
-                  //   (jobs.icp1.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp2.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) ||
-                  //   (jobs.icp3.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp4.some(x => user.profile.occupation.toLowerCase().includes(x)) === true)
-                  // )
-                ){
-                      result.push({
-                          "URL": options[dataURLIndex],
-                          "isNew": "yes",
-                          "Entreprise": dataURL[dataIndex]["Entreprise"],
-                          "Localisation": /*(locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? "France" :*/ user.subline.text,
-                          "Industrie": company.industry,
-                          "Taille": company.size,
-                          "URL Linkedin": company.url_linkedin,
-                          "Prenom": user.profile.firstName,
-                          "Nom": user.profile.lastName,
-                          "Poste": user.profile.occupation,
-                          "Profil Linkedin": user.navigationUrl,
-                          "Domaine Web": "",
-                          "Email": "",
-                          "Telephone": ""
-                      })
-                  }
-              })
-              //Show to the table
-              // if(result.length % mod_leads === 0) io.emit("scrap_result", result);
-              // result = [];
-          }
-      } catch (error) {
-          console.error("pass")
-      }
-      break;
+      let entreprise = dataURL[dataIndex]["Entreprise"]
+      const re = /\s*(?:once|\:|\-|\(|\,|obtain|name|recogn|award|streng|earn|receiv|achiev|acquir|honor|ranked|win|join|recogniz|place|has|tops|scoop|'|take|announc|rating|$)\s*/;
+      if(entreprise.toLowerCase().split(re).length > 1){
+        entreprise = entreprise.toLowerCase().split(re)[0]
+        console.log("===>", deb, entreprise)
+        //Get Linkedin Datas
+        let lnData = await GetLinkedinDataFromCompany(entreprise, true)
+        let users = lnData["Users"]
+        let company = lnData["Company"]
+        try {
+            if (!(users === undefined || users === "" || users === null || users.length === 0)){
+                users.forEach((user)=>{
+                  if(
+                    !(user.profile.firstName === undefined || user.profile.firstName === "" || user.profile.firstName === null  || company.size === "")
+                    // && 
+                    // !(jobs.icpno.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) &&
+                    // (
+                    //   (jobs.icp1.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp2.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) ||
+                    //   (jobs.icp3.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp4.some(x => user.profile.occupation.toLowerCase().includes(x)) === true)
+                    // )
+                  ){
+                        result.push({
+                            "URL": options[dataURLIndex],
+                            "isNew": "yes",
+                            "Entreprise": entreprise,
+                            "Localisation": /*(locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? "France" :*/ user.subline.text,
+                            "Industrie": company.industry,
+                            "Taille": company.size,
+                            "URL Linkedin": company.url_linkedin,
+                            "Prenom": user.profile.firstName,
+                            "Nom": user.profile.lastName,
+                            "Poste": user.profile.occupation,
+                            "Profil Linkedin": user.navigationUrl,
+                            "Domaine Web": "",
+                            "Email": "",
+                            "Telephone": ""
+                        })
+                    }
+                })
+                //Show to the table
+                if(result.length % mod_leads === 0) io.emit("scrap_result", result);
+                // result = [];
+            }
+        } catch (error) {
+            console.error("pass")
+        }
+        }
+        break;
     }
     case 3: {
       const $ = load(html)
       $('.break-words .opacity-60 a', html).each(async(index, el) => {
+        console.log("===>", deb, dataURL[deb]["Entreprise"])
         //Get Linkedin Datas
         let lnData = await GetLinkedinDataFromCompany(dataURL[dataIndex]["Entreprise"], true)
         let users = lnData["Users"]
@@ -19963,13 +19992,60 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
                     }
                 })
                 //Show to the table
-                // if(result.length % mod_leads === 0) io.emit("scrap_result", result);
+                if(result.length % mod_leads === 0) io.emit("scrap_result", result);
                 // result = [];
             }
         } catch (error) {
             console.error("pass")
         }
       })
+      break;
+    }
+    case 4: {
+      console.log("===>", deb, dataURL[deb]["Entreprise"])
+      //Get Linkedin Datas
+      let lnData = await GetLinkedinDataFromCompany(dataURL[dataIndex]["Entreprise"], true)
+      let users = lnData["Users"]
+      let company = lnData["Company"]
+      try {
+          if (!(users === undefined || users === "" || users === null || users.length === 0)){
+              users.forEach((user)=>{
+                  if(
+                    !(user.profile.firstName === undefined || user.profile.firstName === "" || user.profile.firstName === null  || company.size === "")
+                    // &&
+                    // !(jobs.icpno.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) 
+                    // &&
+                    // (
+                    //   (jobs.icp1.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp2.some(x => user.profile.occupation.toLowerCase().includes(x)) === true) ||
+                    //   (jobs.icp3.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp4.some(x => user.profile.occupation.toLowerCase().includes(x)) === true)
+                    // )
+                  ){
+                    // console.log(user)
+                    result.push({
+                        "URL": options[dataURLIndex],
+                        "isNew": "yes",
+                        "Entreprise": dataURL[dataIndex]["Entreprise"],
+                        "Localisation": /*(locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? "France" :*/ user.subline.text,
+                        "Industrie": company.industry,
+                        "Taille": company.size,
+                        "URL Linkedin": company.url_linkedin,
+                        "Prenom": user.profile.firstName,
+                        "Nom": user.profile.lastName,
+                        "Poste": user.profile.occupation,
+                        "Profil Linkedin": user.navigationUrl,
+                        "Domaine Web": "",
+                        "Email": "",
+                        "Telephone": ""
+                    })
+                  }
+              })
+              //Show to the table
+              if(result.length % mod_leads === 0) io.emit("scrap_result", result);
+              // result = [];
+          }
+      } catch (error) {
+          console.error("pass")
+      }
       break;
     }
   }
@@ -19986,6 +20062,7 @@ async function firstScrapData(dataURL,dataURLIndex, url, index){
 }
 function scrapAllURL(selectedOption, dataURL, dataURLIndex){
     if(deb === dataURL.length) {
+      console.log('stop_scrap')
       io.emit("scrap_result", result);
       io.emit("scrap_end", result);
       clearInterval(timerInt)
@@ -20010,37 +20087,70 @@ function scrapAllURL(selectedOption, dataURL, dataURLIndex){
 }
 async function scrapAllCompaniesURL(selectedOption, dataURL, dataURLIndex){
   if(deb === dataURL.length) {
-    io.emit("scrap_result", result);
+    console.log('stop_scrap')
+    // io.emit("scrap_result", result);
     io.emit("scrap_end", result);
     clearInterval(timerInt)
     deb = 0
     inc = deb + 1
     result = [];
   } else {
-    // console.log("===>", deb, dataURL[deb]["Entreprise"])
-    let lnData = await GetLinkedinDataFromCompany(dataURL[deb]["Entreprise"], false)
-    let company = lnData["Company"]
-    if(company.size !== ""){
-      result.push({
-        "URL": selectedOption,
-        "isNew": "yes",
-        "Entreprise": dataURL[deb]["Entreprise"],
-        "Localisation": company.loc,
-        "Industrie": company.industry,
-        "Taille": company.size,
-        "URL Linkedin": company.url_linkedin,
-        "Prenom": "",
-        "Nom": "",
-        "Poste": "",
-        "Profil Linkedin": "",
-        "Domaine Web": "",
-        "Email": "",
-        "Telephone": ""
-      })
+    if(selectedOption === options[2]){
+      let entreprise = dataURL[deb]["Entreprise"]
+      const re = /\s*(?:once|\:|\-|\(|\,|obtain|name|recogn|award|streng|earn|receiv|achiev|acquir|honor|ranked|win|join|recogniz|place|has|tops|scoop|'|take|announc|rating|$)\s*/;
+      if(entreprise.toLowerCase().split(re).length > 1){
+        entreprise = entreprise.toLowerCase().split(re)[0]
+        console.log("===>", deb, entreprise)
+        //Get Linkedin Datas
+        let lnData = await GetLinkedinDataFromCompany(entreprise, false)
+        let company = lnData["Company"]
+        if(company.size !== ""){
+          result.push({
+            "URL": selectedOption,
+            "isNew": "yes",
+            "Entreprise": entreprise,
+            "Localisation": company.loc,
+            "Industrie": company.industry,
+            "Taille": company.size,
+            "URL Linkedin": company.url_linkedin,
+            "Prenom": "",
+            "Nom": "",
+            "Poste": "",
+            "Profil Linkedin": "",
+            "Domaine Web": "",
+            "Email": "",
+            "Telephone": ""
+          })
+        }
+        //Show to the table
+        if(result.length % mod_comp === 0) io.emit("scrap_result", result);
+      }
+    } else {
+      console.log("===>", deb, dataURL[deb]["Entreprise"])
+      let lnData = await GetLinkedinDataFromCompany(dataURL[deb]["Entreprise"], false)
+      let company = lnData["Company"]
+      if(company.size !== ""){
+        result.push({
+          "URL": selectedOption,
+          "isNew": "yes",
+          "Entreprise": dataURL[deb]["Entreprise"],
+          "Localisation": company.loc,
+          "Industrie": company.industry,
+          "Taille": company.size,
+          "URL Linkedin": company.url_linkedin,
+          "Prenom": "",
+          "Nom": "",
+          "Poste": "",
+          "Profil Linkedin": "",
+          "Domaine Web": "",
+          "Email": "",
+          "Telephone": ""
+        })
+      }
+      //Show to the table
+      if(result.length % mod_comp === 0) io.emit("scrap_result", result);
     }
-    //Show to the table
-    // if(result.length % mod_comp === 0) io.emit("scrap_result", result);
-
+  
     deb = inc
     inc = ( (inc+1) >= dataURL.length) ? dataURL.length : (inc+1)
   }
