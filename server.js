@@ -19771,7 +19771,8 @@ async function GetLinkedinDataFromCompany(entreprise, val){
             // console.log("=======> ",company[0])
             if(val === true){
               const peopleScroller = client.search.searchPeople({
-                filters: { company: entreprise, title: "Procurement Director OR Head of QSE OR HSE Manager OR ESG Manager OR Sustainable Manager" /*industry: company[0].headline.text , geoUrn: location */ },
+                //Procurement Director OR Head of QSE OR HSE Manager OR ESG Manager OR Sustainable Manager
+                filters: { company: entreprise, title: "ESG Manager OR Head of RSE OR Head of Sustainability OR CEO OR HR Manager" /*industry: company[0].headline.text , geoUrn: location */ },
                 keywords: entreprise,
                 limit: 50,
               })
