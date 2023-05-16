@@ -29,6 +29,12 @@ const mod_comp = 1
 
 let result = []
 const options = ["SBTI", "CDP", "Ecovadis", "B-Corp", "Test 5 of SBTI"];
+const optionsICP = ["P1 - Persona Sustainability", "P2 - Persona CEO/COO/Legal", "P3 - Persona RH & Marketing"];
+const jobsICP = [
+  "'Sustainability Manager' OR 'Head of Sustainability' OR 'Sustainability Officer' OR 'Chief Impact Officer' OR 'Environmental Manager' OR 'ESG Manager'",
+  "'Chief Procurement Officer' OR 'Chief Legal Officer' OR 'Chief Compliance Officer’ OR ‘Chief Transformation Officer’ OR ‘Head of Operations’",
+  "'Chief Marketing Officer' OR 'Chief People Officer' OR 'Human Resources Director’ OR ‘Head of Marketing’ OR ‘Head of Human Resources’ OR ‘Marketing Director’",
+];
 const jobs = {
   "icp1": ["directeur", "directrice", "director", "head of", "project manager", "chargé", "chargée", "chef de Projet", "cheffe de Projet", "coordinateur", "responsable", "coordinatrice", "coordinator", "chief", "manager", "partner", "analyste"],
   "icp2": ["rse", "qse", "hse", "qhse", "environnement", "développement durable", "sustainability", "esg", "isr", "csr", "impact", "climat", "climate", "numérique responsable", "bas-carbone"],
@@ -39,8 +45,14 @@ const jobs = {
   "icpno": ["sales", "commercial", "adjoint", "assistant", "stagiaire", "consultant", "freelance", "r&d", "si", "it", "administrateur", "business", "fresque", "advisor", "hr", "recruitment"],
 }
 const locs = {
-  "fr": ["france", "paris", "toulouse", "lyon"],
+  "fr": ["france", "paris", "toulouse", "lyon", "belgium", "brussels", "luxembourg", "switzerland", "québec", "quebec"],
+  "us": ["canada", "united states", "usa", "mexico", "greenland", "saint pierre and miquelon"],
+  "uk" : ["germany", "austria","bulgaria","croatia","cyprus","denmark", "spain","estonia","finland","greece","hungary","ireland",
+    "iceland","italy","latvia","liechtenstein","lithuania","malta","norway","netherlands","poland","portugal","czech",
+    "czech","romania", "united kingdom", "slovakia", "slovenia", "sweden", "vatican"],
 }
+const locs_greenly = ["Greenly France", "Greenly USA", "Greenly UK", "Greenly RoW"];
+
 const dataURL = [
   [
     {
@@ -19695,42 +19707,42 @@ const dataURL = [
 // Quand un client se connecte, on le note dans la console
 io.on('connection', function (socket) {
   console.log('client connecté',socket.id);
-  socket.on("get_scrap", function (selectedOption) {
-    console.log('get_scrap')
+  socket.on("get_scrap", function ({selectedOption, selectedOptionICP}) {
+    console.log('get_scrap', selectedOption, selectedOptionICP)
     timerInt = setInterval(()=>{
         // console.log('get_scrap_timer_int')
         if(selectedOption === options[0]){
-          scrapAllURL(selectedOption, dataURL[0], 0)
+          scrapAllURL(selectedOption, selectedOptionICP, dataURL[0], 0)
         } else if(selectedOption === options[1]){
-          scrapAllURL(selectedOption, dataURL[1], 1)
+          scrapAllURL(selectedOption, selectedOptionICP, dataURL[1], 1)
         } else if(selectedOption === options[2]){
-          scrapAllURL(selectedOption, dataURL[2], 2)
+          scrapAllURL(selectedOption, selectedOptionICP, dataURL[2], 2)
         } else if(selectedOption === options[3]){
-          scrapAllURL(selectedOption, dataURL[3], 3)
+          scrapAllURL(selectedOption, selectedOptionICP, dataURL[3], 3)
         } else {
-          scrapAllURL(selectedOption, dataURL[4], 4)
+          scrapAllURL(selectedOption, selectedOptionICP, dataURL[4], 4)
         }
     }, 10 * 1000) // 10sec
   });
-  socket.on("get_comp_scrap", function (selectedOption) {
-    console.log('get_comp_scrap')
+  socket.on("get_comp_scrap", function ({selectedOption, selectedOptionICP}) {
+    console.log('get_scrap_comp', selectedOption, selectedOptionICP)
     timerInt = setInterval(()=>{
         // console.log('get_scrap_timer_int')
         if(selectedOption === options[0]){
-          scrapAllCompaniesURL(selectedOption, dataURL[0], 0)
+          scrapAllCompaniesURL(selectedOption, selectedOptionICP, dataURL[0], 0)
         } else if(selectedOption === options[1]){
-          scrapAllCompaniesURL(selectedOption, dataURL[1], 1)
+          scrapAllCompaniesURL(selectedOption, selectedOptionICP, dataURL[1], 1)
         } else if(selectedOption === options[2]){
-          scrapAllCompaniesURL(selectedOption, dataURL[2], 2)
+          scrapAllCompaniesURL(selectedOption, selectedOptionICP, dataURL[2], 2)
         } else if(selectedOption === options[3]){
-          scrapAllCompaniesURL(selectedOption, dataURL[3], 3)
+          scrapAllCompaniesURL(selectedOption, selectedOptionICP, dataURL[3], 3)
         } else {
-          scrapAllCompaniesURL(selectedOption, dataURL[4], 4)
+          scrapAllCompaniesURL(selectedOption, selectedOptionICP, dataURL[4], 4)
         }
     }, 10 * 1000) // 10sec
   });
-  socket.on("stop_scrap", function (selectedOption) {
-    console.log('stop_scrap')
+  socket.on("stop_scrap", function ({selectedOption, selectedOptionICP}) {
+    console.log('stop_scrap', selectedOption, selectedOptionICP)
     // io.emit("scrap_result", result);
     io.emit("scrap_end", result);
     clearInterval(timerInt)
@@ -19739,7 +19751,7 @@ io.on('connection', function (socket) {
     result = [];
   });
 });
-async function GetLinkedinDataFromCompany(entreprise, val){
+async function GetLinkedinDataFromCompany(selectedOptionICP, entreprise, val){
     // Login
     const client = new Client();
     try {
@@ -19770,9 +19782,11 @@ async function GetLinkedinDataFromCompany(entreprise, val){
           } else {
             // console.log("=======> ",company[0])
             if(val === true){
+              let titleICP = (selectedOptionICP === optionsICP[0]) ? jobsICP[0] : ( (selectedOptionICP === optionsICP[1]) ? jobsICP[1] : jobsICP[2] )
+              // console.log(titleICP)
               const peopleScroller = client.search.searchPeople({
                 //Procurement Director OR Head of QSE OR HSE Manager OR ESG Manager OR Sustainable Manager
-                filters: { company: entreprise, title: "ESG Manager OR Head of RSE OR Head of Sustainability OR CEO OR HR Manager" /*industry: company[0].headline.text , geoUrn: location */ },
+                filters: { company: entreprise, title: titleICP /*industry: company[0].headline.text , geoUrn: location */ },
                 keywords: entreprise,
                 limit: 50,
               })
@@ -19809,14 +19823,15 @@ async function GetLinkedinDataFromCompany(entreprise, val){
       "Users": users
     }
 }
-async function getData(dataURL, dataURLIndex, dataIndex, html, url){
+async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html, url){
   switch(dataURLIndex){
     case 0: {
       console.log("===>", deb, dataURL[deb]["Entreprise"])
       //Get Linkedin Datas
-      let lnData = await GetLinkedinDataFromCompany(dataURL[dataIndex]["Entreprise"], true)
+      let lnData = await GetLinkedinDataFromCompany(selectedOptionICP, dataURL[dataIndex]["Entreprise"], true)
       let users = lnData["Users"]
       let company = lnData["Company"]
+      // console.log("====>>>>>>>>>>", users.length)
       try {
           if (!(users === undefined || users === "" || users === null || users.length === 0)){
               users.forEach((user)=>{
@@ -19836,6 +19851,7 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
                         "isNew": "yes",
                         "Entreprise": dataURL[dataIndex]["Entreprise"],
                         "Localisation": /*(locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? "France" :*/ user.subline.text,
+                        "Geographie Greenly" : (locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[0] : ((locs.us.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[1] : ((locs.uk.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[2] : locs_greenly[3])),
                         "Industrie": company.industry,
                         "Taille": company.size,
                         "URL Linkedin": company.url_linkedin,
@@ -19861,7 +19877,7 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
     case 1: {
       console.log("===>", deb, dataURL[deb]["Entreprise"])
       //Get Linkedin Datas
-      let lnData = await GetLinkedinDataFromCompany(dataURL[dataIndex]["Entreprise"], true)
+      let lnData = await GetLinkedinDataFromCompany(selectedOptionICP, dataURL[dataIndex]["Entreprise"], true)
       let users = lnData["Users"]
       let company = lnData["Company"]
       try {
@@ -19881,6 +19897,7 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
                         "isNew": "yes",
                         "Entreprise": dataURL[dataIndex]["Entreprise"],
                         "Localisation": /*(locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? "France" :*/ user.subline.text,
+                        "Geographie Greenly" : (locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[0] : ((locs.us.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[1] : ((locs.uk.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[2] : locs_greenly[3])),
                         "Industrie": company.industry,
                         "Taille": company.size,
                         "URL Linkedin": company.url_linkedin,
@@ -19910,7 +19927,7 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
         entreprise = entreprise.toLowerCase().split(re)[0]
         console.log("===>", deb, entreprise)
         //Get Linkedin Datas
-        let lnData = await GetLinkedinDataFromCompany(entreprise, true)
+        let lnData = await GetLinkedinDataFromCompany(selectedOptionICP, entreprise, true)
         let users = lnData["Users"]
         let company = lnData["Company"]
         try {
@@ -19930,6 +19947,7 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
                             "isNew": "yes",
                             "Entreprise": entreprise,
                             "Localisation": /*(locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? "France" :*/ user.subline.text,
+                            "Geographie Greenly" : (locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[0] : ((locs.us.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[1] : ((locs.uk.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[2] : locs_greenly[3])),
                             "Industrie": company.industry,
                             "Taille": company.size,
                             "URL Linkedin": company.url_linkedin,
@@ -19958,7 +19976,7 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
       $('.break-words .opacity-60 a', html).each(async(index, el) => {
         console.log("===>", deb, dataURL[deb]["Entreprise"])
         //Get Linkedin Datas
-        let lnData = await GetLinkedinDataFromCompany(dataURL[dataIndex]["Entreprise"], true)
+        let lnData = await GetLinkedinDataFromCompany(selectedOptionICP, dataURL[dataIndex]["Entreprise"], true)
         let users = lnData["Users"]
         let company = lnData["Company"]
         try {
@@ -19979,6 +19997,7 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
                           "isNew": "yes",
                           "Entreprise": dataURL[dataIndex]["Entreprise"],
                           "Localisation": /*(locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? "France" :*/ user.subline.text,
+                          "Geographie Greenly" : (locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[0] : ((locs.us.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[1] : ((locs.uk.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[2] : locs_greenly[3])),
                           "Industrie": company.industry,
                           "Taille": company.size,
                           "URL Linkedin": company.url_linkedin,
@@ -20005,7 +20024,7 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
     case 4: {
       console.log("===>", deb, dataURL[deb]["Entreprise"])
       //Get Linkedin Datas
-      let lnData = await GetLinkedinDataFromCompany(dataURL[dataIndex]["Entreprise"], true)
+      let lnData = await GetLinkedinDataFromCompany(selectedOptionICP, dataURL[dataIndex]["Entreprise"], true)
       let users = lnData["Users"]
       let company = lnData["Company"]
       try {
@@ -20027,6 +20046,7 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
                         "isNew": "yes",
                         "Entreprise": dataURL[dataIndex]["Entreprise"],
                         "Localisation": /*(locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? "France" :*/ user.subline.text,
+                        "Geographie Greenly" : (locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[0] : ((locs.us.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[1] : ((locs.uk.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[2] : locs_greenly[3])),
                         "Industrie": company.industry,
                         "Taille": company.size,
                         "URL Linkedin": company.url_linkedin,
@@ -20051,17 +20071,17 @@ async function getData(dataURL, dataURLIndex, dataIndex, html, url){
     }
   }
 }
-async function firstScrapData(dataURL,dataURLIndex, url, index){
+async function firstScrapData(selectedOptionICP, dataURL,dataURLIndex, url, index){
     try {
         const response = (await fetch(url))
         const html = await response.text()
         // console.log("HTML : " + url + " - " + html)
-        await getData(dataURL,dataURLIndex, index, html, url)
+        await getData(selectedOptionICP, dataURL,dataURLIndex, index, html, url)
     } catch (error) {
         console.error(error)
     }
 }
-function scrapAllURL(selectedOption, dataURL, dataURLIndex){
+function scrapAllURL(selectedOption, selectedOptionICP, dataURL, dataURLIndex){
     if(deb === dataURL.length) {
       console.log('stop_scrap')
       io.emit("scrap_result", result);
@@ -20071,22 +20091,24 @@ function scrapAllURL(selectedOption, dataURL, dataURLIndex){
       inc = deb + 1
       result = [];
     } else {
-      console.log("===>", deb, dataURL[deb]["Entreprise"])
+      // console.log("===>", deb, dataURL[deb]["Entreprise"])
       if(selectedOption === options[0]){
-        getData(dataURL, dataURLIndex, deb, "", "")
+        getData(selectedOptionICP, dataURL, dataURLIndex, deb, "", "")
       } else if(selectedOption === options[1]){
-        getData(dataURL, dataURLIndex, deb, "", "")
+        getData(selectedOptionICP, dataURL, dataURLIndex, deb, "", "")
       } else if(selectedOption === options[2]){
-        getData(dataURL, dataURLIndex, deb, "", "")
+        getData(selectedOptionICP, dataURL, dataURLIndex, deb, "", "")
       } else if(selectedOption === options[3]){
-        firstScrapData(dataURL, dataURLIndex, dataURL[deb]["FisrtURL"], deb)
+        firstScrapData(selectedOptionICP, dataURL, dataURLIndex, dataURL[deb]["FisrtURL"], deb)
+      } else if(selectedOption === options[4]) {
+        getData(selectedOptionICP, dataURL, dataURLIndex, deb, "", "")
       }
 
       deb = inc
       inc = ( (inc+1) >= dataURL.length) ? dataURL.length : (inc+1)
     }
 }
-async function scrapAllCompaniesURL(selectedOption, dataURL, dataURLIndex){
+async function scrapAllCompaniesURL(selectedOption, selectedOptionICP, dataURL, dataURLIndex){
   if(deb === dataURL.length) {
     console.log('stop_scrap')
     // io.emit("scrap_result", result);
@@ -20103,7 +20125,7 @@ async function scrapAllCompaniesURL(selectedOption, dataURL, dataURLIndex){
         entreprise = entreprise.toLowerCase().split(re)[0]
         console.log("===>", deb, entreprise)
         //Get Linkedin Datas
-        let lnData = await GetLinkedinDataFromCompany(entreprise, false)
+        let lnData = await GetLinkedinDataFromCompany(selectedOptionICP, entreprise, false)
         let company = lnData["Company"]
         if(company.size !== ""){
           result.push({
@@ -20111,6 +20133,7 @@ async function scrapAllCompaniesURL(selectedOption, dataURL, dataURLIndex){
             "isNew": "yes",
             "Entreprise": entreprise,
             "Localisation": company.loc,
+            "Geographie Greenly" : "",
             "Industrie": company.industry,
             "Taille": company.size,
             "URL Linkedin": company.url_linkedin,
@@ -20128,7 +20151,7 @@ async function scrapAllCompaniesURL(selectedOption, dataURL, dataURLIndex){
       }
     } else {
       console.log("===>", deb, dataURL[deb]["Entreprise"])
-      let lnData = await GetLinkedinDataFromCompany(dataURL[deb]["Entreprise"], false)
+      let lnData = await GetLinkedinDataFromCompany(selectedOptionICP, dataURL[deb]["Entreprise"], false)
       let company = lnData["Company"]
       if(company.size !== ""){
         result.push({
@@ -20136,6 +20159,7 @@ async function scrapAllCompaniesURL(selectedOption, dataURL, dataURLIndex){
           "isNew": "yes",
           "Entreprise": dataURL[deb]["Entreprise"],
           "Localisation": company.loc,
+          "Geographie Greenly" : "",
           "Industrie": company.industry,
           "Taille": company.size,
           "URL Linkedin": company.url_linkedin,
