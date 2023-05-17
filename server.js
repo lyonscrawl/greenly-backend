@@ -7,7 +7,7 @@ import express from 'express';
 import http from "http";
 import compression from "compression"
 
-//make the server and the socketsio
+//make the server and the socketsio yanne sidibe
 
 // if (process.env.NODE_ENV !== 'production') { dotenv.config() }
 const app = express();
