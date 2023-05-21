@@ -19728,8 +19728,10 @@ io.on('connection', function (socket) {
     user_connected = false
     console.log('client déconnecté', reason, user_connected)
   });
-  socket.on("get_scrap", function ({selectedOption, selectedOptionICP}) {
-    console.log('get_scrap', selectedOption, selectedOptionICP)
+  socket.on("get_scrap", function ({selectedOption, selectedOptionICP, debVal}) {
+    deb = debVal
+    inc = deb + 1
+    console.log('get_scrap', selectedOption, selectedOptionICP, deb, inc)
     timerInt = setInterval(()=>{
         // console.log('get_scrap_timer_int')
         if(selectedOption === options[0]){
@@ -19745,8 +19747,10 @@ io.on('connection', function (socket) {
         }
     }, 10 * 1000) // 10sec
   });
-  socket.on("get_comp_scrap", function ({selectedOption, selectedOptionICP}) {
-    console.log('get_scrap_comp', selectedOption, selectedOptionICP)
+  socket.on("get_comp_scrap", function ({selectedOption, selectedOptionICP, debVal}) {
+    deb = debVal
+    inc = deb + 1
+    console.log('get_scrap_comp', selectedOption, selectedOptionICP, deb, inc)
     timerInt = setInterval(()=>{
         // console.log('get_scrap_timer_int')
         if(selectedOption === options[0]){
@@ -19762,10 +19766,10 @@ io.on('connection', function (socket) {
         }
     }, 10 * 1000) // 10sec
   });
-  socket.on("stop_scrap", function ({selectedOption, selectedOptionICP}) {
-    console.log('stop_scrap', selectedOption, selectedOptionICP)
-    // io.emit("scrap_result", result);
-    io.emit("scrap_end", result);
+  socket.on("stop_scrap", function () {
+    console.log('stop_scrap')
+    // io.emit("scrap_result", {"result": result, "deb": deb});
+    io.emit("scrap_end");
     clearInterval(timerInt)
     deb = 0
     inc = deb + 1
@@ -19891,8 +19895,8 @@ async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html
                   }
               })
               //Show to the table
-              io.emit("scrap_result", result);
-              // if(result.length % mod_leads === 0) io.emit("scrap_result", result);
+              io.emit("scrap_result", {"result": result, "deb": deb});
+              // if(result.length % mod_leads === 0) io.emit("scrap_result", {"result": result, "deb": deb});
               // result = [];
           } else {
             result.push({
@@ -19913,7 +19917,7 @@ async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html
               "Telephone": ""
             })
             //Show to the table
-            io.emit("scrap_result", result);
+            io.emit("scrap_result", {"result": result, "deb": deb});
           }
       } catch (error) {
           console.error("pass")
@@ -19958,7 +19962,7 @@ async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html
                   }
               })
               //Show to the table
-              io.emit("scrap_result", result);
+              io.emit("scrap_result", {"result": result, "deb": deb});
               // result = [];
             } else {
               result.push({
@@ -19979,7 +19983,7 @@ async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html
                 "Telephone": ""
               })
               //Show to the table
-              io.emit("scrap_result", result);
+              io.emit("scrap_result", {"result": result, "deb": deb});
             }
       } catch (error) {
           console.error("pass")
@@ -20028,7 +20032,7 @@ async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html
                     }
                 })
                 //Show to the table
-                io.emit("scrap_result", result);
+                io.emit("scrap_result", {"result": result, "deb": deb});
                 // result = [];
             } else {
                 result.push({
@@ -20049,7 +20053,7 @@ async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html
                   "Telephone": ""
                 })
                 //Show to the table
-                io.emit("scrap_result", result);
+                io.emit("scrap_result", {"result": result, "deb": deb});
             }
         } catch (error) {
             console.error("pass")
@@ -20098,7 +20102,7 @@ async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html
                     }
                 })
                 //Show to the table
-                io.emit("scrap_result", result);
+                io.emit("scrap_result", {"result": result, "deb": deb});
                 // result = [];
               } else {
                 result.push({
@@ -20119,7 +20123,7 @@ async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html
                   "Telephone": ""
                 })
                 //Show to the table
-                io.emit("scrap_result", result);
+                io.emit("scrap_result", {"result": result, "deb": deb});
               }
         } catch (error) {
             console.error("pass")
@@ -20167,7 +20171,7 @@ async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html
                   }
               })
               //Show to the table
-              io.emit("scrap_result", result);
+              io.emit("scrap_result", {"result": result, "deb": deb});
               // result = [];
             } else {
               result.push({
@@ -20188,7 +20192,7 @@ async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html
                 "Telephone": ""
               })
               //Show to the table
-              io.emit("scrap_result", result);
+              io.emit("scrap_result", {"result": result, "deb": deb});
             }
       } catch (error) {
           console.error("pass")
@@ -20210,8 +20214,8 @@ async function firstScrapData(selectedOptionICP, dataURL,dataURLIndex, url, inde
 function scrapAllURL(selectedOption, selectedOptionICP, dataURL, dataURLIndex){
     if(deb === dataURL.length) {
       console.log('stop_scrap')
-      io.emit("scrap_result", result);
-      io.emit("scrap_end", result);
+      io.emit("scrap_result", {"result": result, "deb": deb});
+      io.emit("scrap_end");
       clearInterval(timerInt)
       deb = 0
       inc = deb + 1
@@ -20232,13 +20236,14 @@ function scrapAllURL(selectedOption, selectedOptionICP, dataURL, dataURLIndex){
 
       deb = inc
       inc = ( (inc+1) >= dataURL.length) ? dataURL.length : (inc+1)
+      result = [];
     }
 }
 async function scrapAllCompaniesURL(selectedOption, selectedOptionICP, dataURL, dataURLIndex){
   if(deb === dataURL.length) {
     console.log('stop_scrap')
-    // io.emit("scrap_result", result);
-    io.emit("scrap_end", result);
+    // io.emit("scrap_result", {"result": result, "deb": deb});
+    io.emit("scrap_end");
     clearInterval(timerInt)
     deb = 0
     inc = deb + 1
@@ -20271,10 +20276,28 @@ async function scrapAllCompaniesURL(selectedOption, selectedOptionICP, dataURL, 
             "Email": "",
             "Telephone": ""
           })
+        } else {
+          result.push({
+            "URL": selectedOption,
+            "isNew": "notfound",
+            "Entreprise": entreprise,
+            "Localisation": company.loc,
+            "Geographie Greenly" : "",
+            "Industrie": company.industry,
+            "Taille": company.size,
+            "URL Linkedin": company.url_linkedin,
+            "Prenom": "",
+            "Nom": "",
+            "Poste": "",
+            "Profil Linkedin": "",
+            "Domaine Web": "",
+            "Email": "",
+            "Telephone": ""
+          })
         }
         //Show to the table
         //if(result.length % mod_comp === 0) 
-        io.emit("scrap_result", result);
+        io.emit("scrap_result", {"result": result, "deb": deb});
       }
     } else {
       console.log("===>", deb, dataURL[deb]["Entreprise"])
@@ -20298,14 +20321,33 @@ async function scrapAllCompaniesURL(selectedOption, selectedOptionICP, dataURL, 
           "Email": "",
           "Telephone": ""
         })
+      } else {
+        result.push({
+          "URL": selectedOption,
+          "isNew": "notfound",
+          "Entreprise": dataURL[deb]["Entreprise"],
+          "Localisation": company.loc,
+          "Geographie Greenly" : "",
+          "Industrie": company.industry,
+          "Taille": company.size,
+          "URL Linkedin": company.url_linkedin,
+          "Prenom": "",
+          "Nom": "",
+          "Poste": "",
+          "Profil Linkedin": "",
+          "Domaine Web": "",
+          "Email": "",
+          "Telephone": ""
+        })
       }
       //Show to the table
       // if(result.length % mod_comp === 0) 
-      io.emit("scrap_result", result);
+      io.emit("scrap_result", {"result": result, "deb": deb});
     }
   
     deb = inc
     inc = ( (inc+1) >= dataURL.length) ? dataURL.length : (inc+1)
+    result = [];
   }
 }
 
