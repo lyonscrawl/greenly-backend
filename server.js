@@ -19832,9 +19832,16 @@ async function GetLinkedinDataFromCompany(selectedOptionICP, entreprise, val){
           }
         }
     } catch (error) {
-        console.log("==>> erreur", error)
+      if(error.response.status === 429){
+        console.log("==>> erreur", error.response.statusText)
+        io.emit("scrap_error");
+        io.emit("scrap_end");
+        clearInterval(timerInt)
+      } else {
+        console.log("==>> pass")
         users = []
         company = []
+      }
     }
     // console.log("=>>>>", company)
     // let tmp = company[0].subline.text.split(" ")[0].split("-")[0].length
