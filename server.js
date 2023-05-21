@@ -29,7 +29,7 @@ const mod_comp = 1
 
 let result = []
 const options = ["SBTI", "CDP", "Ecovadis", "B-Corp", "Test 5 of SBTI"];
-const optionsICP = ["P1 - Persona Sustainability", "P2 - Persona CEO/COO/Legal", "P3 - Persona RH & Marketing"];
+const optionsICP = ["All - P1 + P2 + P3", "P1 - Persona Sustainability", "P2 - Persona CEO/COO/Legal", "P3 - Persona RH & Marketing"];
 const jobsICP = [
   "'Sustainability Manager' OR 'Head of Sustainability' OR 'Sustainability Officer' OR 'Chief Impact Officer' OR 'Environmental Manager' OR 'ESG Manager'",
   "'Chief Procurement Officer' OR 'Chief Legal Officer' OR 'Chief Compliance Officer’ OR ‘Chief Transformation Officer’ OR ‘Head of Operations’",
@@ -46,7 +46,7 @@ const jobs = {
 }
 const locs = {
   "fr": ["france", "paris", "toulouse", "lyon", "belgium", "brussels", "luxembourg", "switzerland", "québec", "quebec"],
-  "us": ["canada", "united states", "usa", "mexico", "greenland", "saint pierre and miquelon"],
+  "us": ["canada", "united states", "usa", "mexico", "greenland", "saint pierre and miquelon", "san fransisco", "california"],
   "uk" : ["germany", "austria","bulgaria","croatia","cyprus","denmark", "spain","estonia","finland","greece","hungary","ireland",
     "iceland","italy","latvia","liechtenstein","lithuania","malta","norway","netherlands","poland","portugal","czech",
     "czech","romania", "united kingdom", "slovakia", "slovenia", "sweden", "vatican"],
@@ -19704,9 +19704,30 @@ const dataURL = [
   ],
 ]
 
+let user_connected = false
+
 // Quand un client se connecte, on le note dans la console
 io.on('connection', function (socket) {
-  console.log('client connecté',socket.id);
+  socket.on("signin", function ({email, password}) {
+    // console.log('signin', email, password)
+    let signin_result = 0
+    if(!user_connected){
+      if(email.toLowerCase().includes("@greenly.earth") && password === "S1fv@10nJ#H"){
+        signin_result = 0
+        user_connected = true
+        console.log('client connecté', socket.id, user_connected);
+      } else (
+        signin_result = 1
+      )
+    } else {
+      signin_result = 2
+    }
+    io.emit("signin_result", {"signin_result": signin_result, "id": socket.id});
+  });
+  socket.on("disconnect", (reason) => {
+    user_connected = false
+    console.log('client déconnecté', reason, user_connected)
+  });
   socket.on("get_scrap", function ({selectedOption, selectedOptionICP}) {
     console.log('get_scrap', selectedOption, selectedOptionICP)
     timerInt = setInterval(()=>{
@@ -19751,6 +19772,7 @@ io.on('connection', function (socket) {
     result = [];
   });
 });
+
 async function GetLinkedinDataFromCompany(selectedOptionICP, entreprise, val){
     // Login
     const client = new Client();
@@ -19782,15 +19804,18 @@ async function GetLinkedinDataFromCompany(selectedOptionICP, entreprise, val){
           } else {
             // console.log("=======> ",company[0])
             if(val === true){
-              let titleICP = (selectedOptionICP === optionsICP[0]) ? jobsICP[0] : ( (selectedOptionICP === optionsICP[1]) ? jobsICP[1] : jobsICP[2] )
-              // console.log(titleICP)
-              const peopleScroller = client.search.searchPeople({
-                //Procurement Director OR Head of QSE OR HSE Manager OR ESG Manager OR Sustainable Manager
-                filters: { company: entreprise, title: titleICP /*industry: company[0].headline.text , geoUrn: location */ },
-                keywords: entreprise,
-                limit: 50,
-              })
-              users = await peopleScroller.fetch()
+              if(selectedOptionICP === optionsICP[0]){
+                const jobs1 = await client.search.searchPeople({filters: { company: entreprise, title: jobsICP[0]},keywords: entreprise,limit: 50}).fetch()
+                const jobs2 = await client.search.searchPeople({filters: { company: entreprise, title: jobsICP[1]},keywords: entreprise,limit: 50}).fetch()
+                const jobs3 = await client.search.searchPeople({filters: { company: entreprise, title: jobsICP[3]},keywords: entreprise,limit: 50}).fetch()
+                users = users.concat(jobs1)
+                users = users.concat(jobs2)
+                users = users.concat(jobs3)
+                users = [...new Map(users.map(v => [v["navigationUrl"], v])).values()]
+              } else {
+                let titleICP = (selectedOptionICP === optionsICP[0]) ? jobsICP[0] : ( (selectedOptionICP === optionsICP[1]) ? jobsICP[1] : ( (selectedOptionICP === optionsICP[2]) ? jobsICP[2] : jobsICP[3] ) )
+                users = await client.search.searchPeople({filters: { company: entreprise, title: titleICP},keywords: entreprise,limit: 50}).fetch()
+              }              
             } 
             // else {
             //   const peopleScroller = client.search.searchPeople({
@@ -19866,8 +19891,29 @@ async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html
                   }
               })
               //Show to the table
-              if(result.length % mod_leads === 0) io.emit("scrap_result", result);
+              io.emit("scrap_result", result);
+              // if(result.length % mod_leads === 0) io.emit("scrap_result", result);
               // result = [];
+          } else {
+            result.push({
+              "URL": options[dataURLIndex],
+              "isNew": "notfound",
+              "Entreprise": dataURL[dataIndex]["Entreprise"],
+              "Localisation": "",
+              "Geographie Greenly" : "",
+              "Industrie": company.industry,
+              "Taille": company.size,
+              "URL Linkedin": company.url_linkedin,
+              "Prenom": "",
+              "Nom": "",
+              "Poste": "",
+              "Profil Linkedin": "",
+              "Domaine Web": "",
+              "Email": "",
+              "Telephone": ""
+            })
+            //Show to the table
+            io.emit("scrap_result", result);
           }
       } catch (error) {
           console.error("pass")
@@ -19912,9 +19958,29 @@ async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html
                   }
               })
               //Show to the table
-              if(result.length % mod_leads === 0) io.emit("scrap_result", result);
+              io.emit("scrap_result", result);
               // result = [];
-          }
+            } else {
+              result.push({
+                "URL": options[dataURLIndex],
+                "isNew": "notfound",
+                "Entreprise": dataURL[dataIndex]["Entreprise"],
+                "Localisation": "",
+                "Geographie Greenly" : "",
+                "Industrie": company.industry,
+                "Taille": company.size,
+                "URL Linkedin": company.url_linkedin,
+                "Prenom": "",
+                "Nom": "",
+                "Poste": "",
+                "Profil Linkedin": "",
+                "Domaine Web": "",
+                "Email": "",
+                "Telephone": ""
+              })
+              //Show to the table
+              io.emit("scrap_result", result);
+            }
       } catch (error) {
           console.error("pass")
       }
@@ -19962,14 +20028,34 @@ async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html
                     }
                 })
                 //Show to the table
-                if(result.length % mod_leads === 0) io.emit("scrap_result", result);
+                io.emit("scrap_result", result);
                 // result = [];
+            } else {
+                result.push({
+                  "URL": options[dataURLIndex],
+                  "isNew": "notfound",
+                  "Entreprise": entreprise,
+                  "Localisation": "",
+                  "Geographie Greenly" : "",
+                  "Industrie": company.industry,
+                  "Taille": company.size,
+                  "URL Linkedin": company.url_linkedin,
+                  "Prenom": "",
+                  "Nom": "",
+                  "Poste": "",
+                  "Profil Linkedin": "",
+                  "Domaine Web": "",
+                  "Email": "",
+                  "Telephone": ""
+                })
+                //Show to the table
+                io.emit("scrap_result", result);
             }
         } catch (error) {
             console.error("pass")
         }
-        }
-        break;
+      }
+      break;
     }
     case 3: {
       const $ = load(html)
@@ -20012,9 +20098,29 @@ async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html
                     }
                 })
                 //Show to the table
-                if(result.length % mod_leads === 0) io.emit("scrap_result", result);
+                io.emit("scrap_result", result);
                 // result = [];
-            }
+              } else {
+                result.push({
+                  "URL": options[dataURLIndex],
+                  "isNew": "notfound",
+                  "Entreprise": dataURL[dataIndex]["Entreprise"],
+                  "Localisation": "",
+                  "Geographie Greenly" : "",
+                  "Industrie": company.industry,
+                  "Taille": company.size,
+                  "URL Linkedin": company.url_linkedin,
+                  "Prenom": "",
+                  "Nom": "",
+                  "Poste": "",
+                  "Profil Linkedin": "",
+                  "Domaine Web": "",
+                  "Email": "",
+                  "Telephone": ""
+                })
+                //Show to the table
+                io.emit("scrap_result", result);
+              }
         } catch (error) {
             console.error("pass")
         }
@@ -20061,9 +20167,29 @@ async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html
                   }
               })
               //Show to the table
-              if(result.length % mod_leads === 0) io.emit("scrap_result", result);
+              io.emit("scrap_result", result);
               // result = [];
-          }
+            } else {
+              result.push({
+                "URL": options[dataURLIndex],
+                "isNew": "notfound",
+                "Entreprise": dataURL[dataIndex]["Entreprise"],
+                "Localisation": "",
+                "Geographie Greenly" : "",
+                "Industrie": company.industry,
+                "Taille": company.size,
+                "URL Linkedin": company.url_linkedin,
+                "Prenom": "",
+                "Nom": "",
+                "Poste": "",
+                "Profil Linkedin": "",
+                "Domaine Web": "",
+                "Email": "",
+                "Telephone": ""
+              })
+              //Show to the table
+              io.emit("scrap_result", result);
+            }
       } catch (error) {
           console.error("pass")
       }
@@ -20147,7 +20273,8 @@ async function scrapAllCompaniesURL(selectedOption, selectedOptionICP, dataURL, 
           })
         }
         //Show to the table
-        if(result.length % mod_comp === 0) io.emit("scrap_result", result);
+        //if(result.length % mod_comp === 0) 
+        io.emit("scrap_result", result);
       }
     } else {
       console.log("===>", deb, dataURL[deb]["Entreprise"])
@@ -20173,7 +20300,8 @@ async function scrapAllCompaniesURL(selectedOption, selectedOptionICP, dataURL, 
         })
       }
       //Show to the table
-      if(result.length % mod_comp === 0) io.emit("scrap_result", result);
+      // if(result.length % mod_comp === 0) 
+      io.emit("scrap_result", result);
     }
   
     deb = inc
