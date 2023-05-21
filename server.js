@@ -19832,7 +19832,7 @@ async function GetLinkedinDataFromCompany(selectedOptionICP, entreprise, val){
           }
         }
     } catch (error) {
-        console.log("==>> erreur")
+        console.log("==>> erreur", error)
         users = []
         company = []
     }
