@@ -45,7 +45,7 @@ const jobs = {
   "icpno": ["sales", "commercial", "adjoint", "assistant", "stagiaire", "consultant", "freelance", "r&d", "si", "it", "administrateur", "business", "fresque", "advisor", "hr", "recruitment"],
 }
 const locs = {
-  "fr": ["france", "paris", "toulouse", "lyon", "belgium", "brussels", "luxembourg", "switzerland", "québec", "quebec"],
+  "fr": ["france", "paris", "rennes", "marseille", "toulouse", "lyon", "belgium", "brussels", "luxembourg", "switzerland", "québec", "quebec"],
   "us": ["canada", "united states", "usa", "mexico", "greenland", "saint pierre and miquelon", "san fransisco", "california"],
   "uk" : ["germany", "austria","bulgaria","croatia","cyprus","denmark", "spain","estonia","finland","greece","hungary","ireland",
     "iceland","italy","latvia","liechtenstein","lithuania","malta","norway","netherlands","poland","portugal","czech",
@@ -19883,21 +19883,23 @@ async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html
                   ){
                     // console.log(user)
                     result.push({
-                        "URL": options[dataURLIndex],
-                        "isNew": "yes",
-                        "Entreprise": dataURL[dataIndex]["Entreprise"],
-                        "Localisation": /*(locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? "France" :*/ user.subline.text,
-                        "Geographie Greenly" : (locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[0] : ((locs.us.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[1] : ((locs.uk.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[2] : locs_greenly[3])),
-                        "Industrie": company.industry,
-                        "Taille": company.size,
-                        "URL Linkedin": company.url_linkedin,
-                        "Prenom": user.profile.firstName,
-                        "Nom": user.profile.lastName,
-                        "Poste": user.profile.occupation,
-                        "Profil Linkedin": user.navigationUrl,
-                        "Domaine Web": "",
-                        "Email": "",
-                        "Telephone": ""
+                      "URL": options[dataURLIndex],
+                      "isNew": "yes",
+                      "Persona": selectedOptionICP,
+                      "Rank": deb,
+                      "Company": dataURL[dataIndex]["Entreprise"],
+                      "Location": /*(locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? "France" :*/ user.subline.text,
+                      "Greenly Geography" : (locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[0] : ((locs.us.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[1] : ((locs.uk.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[2] : locs_greenly[3])),
+                      "Industry": company.industry,
+                      "Size": company.size,
+                      "Linkedin URL": company.url_linkedin,
+                      "Firstname": user.profile.firstName,
+                      "Lastname": user.profile.lastName,
+                      "Position": user.profile.occupation,
+                      "Linkedin Profile": user.navigationUrl,
+                      "Web Domain": "",
+                      "Email": "",
+                      "Phone": ""
                     })
                   }
               })
@@ -19909,19 +19911,21 @@ async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html
             result.push({
               "URL": options[dataURLIndex],
               "isNew": "notfound",
-              "Entreprise": dataURL[dataIndex]["Entreprise"],
-              "Localisation": "",
-              "Geographie Greenly" : "",
-              "Industrie": company.industry,
-              "Taille": company.size,
-              "URL Linkedin": company.url_linkedin,
-              "Prenom": "",
-              "Nom": "",
-              "Poste": "",
-              "Profil Linkedin": "",
-              "Domaine Web": "",
+              "Persona": selectedOptionICP,
+              "Rank": deb,
+              "Company": dataURL[dataIndex]["Entreprise"],
+              "Location": "",
+              "Greenly Geography" : "",
+              "Industry": company.industry,
+              "Size": company.size,
+              "Linkedin URL": company.url_linkedin,
+              "Firstname": "",
+              "Lastname": "",
+              "Position": "",
+              "Linkedin Profile": "",
+              "Web Domain": "",
               "Email": "",
-              "Telephone": ""
+              "Phone": ""
             })
             //Show to the table
             io.emit("scrap_result", {"result": result, "deb": deb});
@@ -19950,21 +19954,23 @@ async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html
                   // )
                 ){
                     result.push({
-                        "URL": options[dataURLIndex],
-                        "isNew": "yes",
-                        "Entreprise": dataURL[dataIndex]["Entreprise"],
-                        "Localisation": /*(locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? "France" :*/ user.subline.text,
-                        "Geographie Greenly" : (locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[0] : ((locs.us.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[1] : ((locs.uk.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[2] : locs_greenly[3])),
-                        "Industrie": company.industry,
-                        "Taille": company.size,
-                        "URL Linkedin": company.url_linkedin,
-                        "Prenom": user.profile.firstName,
-                        "Nom": user.profile.lastName,
-                        "Poste": user.profile.occupation,
-                        "Profil Linkedin": user.navigationUrl,
-                        "Domaine Web": "",
-                        "Email": "",
-                        "Telephone": ""
+                      "URL": options[dataURLIndex],
+                      "isNew": "yes",
+                      "Persona": selectedOptionICP,
+                      "Rank": deb,
+                      "Company": dataURL[dataIndex]["Entreprise"],
+                      "Location": /*(locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? "France" :*/ user.subline.text,
+                      "Greenly Geography" : (locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[0] : ((locs.us.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[1] : ((locs.uk.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[2] : locs_greenly[3])),
+                      "Industry": company.industry,
+                      "Size": company.size,
+                      "Linkedin URL": company.url_linkedin,
+                      "Firstname": user.profile.firstName,
+                      "Lastname": user.profile.lastName,
+                      "Position": user.profile.occupation,
+                      "Linkedin Profile": user.navigationUrl,
+                      "Web Domain": "",
+                      "Email": "",
+                      "Phone": ""
                     })
                   }
               })
@@ -19975,19 +19981,21 @@ async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html
               result.push({
                 "URL": options[dataURLIndex],
                 "isNew": "notfound",
-                "Entreprise": dataURL[dataIndex]["Entreprise"],
-                "Localisation": "",
-                "Geographie Greenly" : "",
-                "Industrie": company.industry,
-                "Taille": company.size,
-                "URL Linkedin": company.url_linkedin,
-                "Prenom": "",
-                "Nom": "",
-                "Poste": "",
-                "Profil Linkedin": "",
-                "Domaine Web": "",
+                "Persona": selectedOptionICP,
+                "Rank": deb,
+                "Company": dataURL[dataIndex]["Entreprise"],
+                "Location": "",
+                "Greenly Geography" : "",
+                "Industry": company.industry,
+                "Size": company.size,
+                "Linkedin URL": company.url_linkedin,
+                "Firstname": "",
+                "Lastname": "",
+                "Position": "",
+                "Linkedin Profile": "",
+                "Web Domain": "",
                 "Email": "",
-                "Telephone": ""
+                "Phone": ""
               })
               //Show to the table
               io.emit("scrap_result", {"result": result, "deb": deb});
@@ -20019,23 +20027,25 @@ async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html
                     //   (jobs.icp3.some(x => user.profile.occupation.toLowerCase().includes(x)) === true && jobs.icp4.some(x => user.profile.occupation.toLowerCase().includes(x)) === true)
                     // )
                   ){
-                        result.push({
-                            "URL": options[dataURLIndex],
-                            "isNew": "yes",
-                            "Entreprise": entreprise,
-                            "Localisation": /*(locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? "France" :*/ user.subline.text,
-                            "Geographie Greenly" : (locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[0] : ((locs.us.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[1] : ((locs.uk.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[2] : locs_greenly[3])),
-                            "Industrie": company.industry,
-                            "Taille": company.size,
-                            "URL Linkedin": company.url_linkedin,
-                            "Prenom": user.profile.firstName,
-                            "Nom": user.profile.lastName,
-                            "Poste": user.profile.occupation,
-                            "Profil Linkedin": user.navigationUrl,
-                            "Domaine Web": "",
-                            "Email": "",
-                            "Telephone": ""
-                        })
+                      result.push({
+                        "URL": options[dataURLIndex],
+                        "isNew": "yes",
+                        "Persona": selectedOptionICP,
+                        "Rank": deb,
+                        "Company": entreprise,
+                        "Location": /*(locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? "France" :*/ user.subline.text,
+                        "Greenly Geography" : (locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[0] : ((locs.us.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[1] : ((locs.uk.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[2] : locs_greenly[3])),
+                        "Industry": company.industry,
+                        "Size": company.size,
+                        "Linkedin URL": company.url_linkedin,
+                        "Firstname": user.profile.firstName,
+                        "Lastname": user.profile.lastName,
+                        "Position": user.profile.occupation,
+                        "Linkedin Profile": user.navigationUrl,
+                        "Web Domain": "",
+                        "Email": "",
+                        "Phone": ""
+                      })
                     }
                 })
                 //Show to the table
@@ -20045,19 +20055,21 @@ async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html
                 result.push({
                   "URL": options[dataURLIndex],
                   "isNew": "notfound",
-                  "Entreprise": entreprise,
-                  "Localisation": "",
-                  "Geographie Greenly" : "",
-                  "Industrie": company.industry,
-                  "Taille": company.size,
-                  "URL Linkedin": company.url_linkedin,
-                  "Prenom": "",
-                  "Nom": "",
-                  "Poste": "",
-                  "Profil Linkedin": "",
-                  "Domaine Web": "",
+                  "Persona": selectedOptionICP,
+                  "Rank": deb,
+                  "Company": entreprise,
+                  "Location": "",
+                  "Greenly Geography" : "",
+                  "Industry": company.industry,
+                  "Size": company.size,
+                  "Linkedin URL": company.url_linkedin,
+                  "Firstname": "",
+                  "Lastname": "",
+                  "Position": "",
+                  "Linkedin Profile": "",
+                  "Web Domain": "",
                   "Email": "",
-                  "Telephone": ""
+                  "Phone": ""
                 })
                 //Show to the table
                 io.emit("scrap_result", {"result": result, "deb": deb});
@@ -20090,21 +20102,23 @@ async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html
                   ){
                     // console.log(dataURL[dataIndex]["Entreprise"])
                       result.push({
-                          "URL": options[dataURLIndex],
-                          "isNew": "yes",
-                          "Entreprise": dataURL[dataIndex]["Entreprise"],
-                          "Localisation": /*(locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? "France" :*/ user.subline.text,
-                          "Geographie Greenly" : (locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[0] : ((locs.us.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[1] : ((locs.uk.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[2] : locs_greenly[3])),
-                          "Industrie": company.industry,
-                          "Taille": company.size,
-                          "URL Linkedin": company.url_linkedin,
-                          "Prenom": user.profile.firstName,
-                          "Nom": user.profile.lastName,
-                          "Poste": user.profile.occupation,
-                          "Profil Linkedin": user.navigationUrl,
-                          "Domaine Web": $(el).attr("href"),
-                          "Email": "",
-                          "Telephone": ""
+                        "URL": options[dataURLIndex],
+                        "isNew": "yes",
+                        "Persona": selectedOptionICP,
+                        "Rank": deb,
+                        "Company": dataURL[dataIndex]["Entreprise"],
+                        "Location": /*(locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? "France" :*/ user.subline.text,
+                        "Greenly Geography" : (locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[0] : ((locs.us.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[1] : ((locs.uk.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[2] : locs_greenly[3])),
+                        "Industry": company.industry,
+                        "Size": company.size,
+                        "Linkedin URL": company.url_linkedin,
+                        "Firstname": user.profile.firstName,
+                        "Lastname": user.profile.lastName,
+                        "Position": user.profile.occupation,
+                        "Linkedin Profile": user.navigationUrl,
+                        "Web Domain": "",
+                        "Email": "",
+                        "Phone": ""
                       })
                     }
                 })
@@ -20115,19 +20129,21 @@ async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html
                 result.push({
                   "URL": options[dataURLIndex],
                   "isNew": "notfound",
-                  "Entreprise": dataURL[dataIndex]["Entreprise"],
-                  "Localisation": "",
-                  "Geographie Greenly" : "",
-                  "Industrie": company.industry,
-                  "Taille": company.size,
-                  "URL Linkedin": company.url_linkedin,
-                  "Prenom": "",
-                  "Nom": "",
-                  "Poste": "",
-                  "Profil Linkedin": "",
-                  "Domaine Web": "",
+                  "Persona": selectedOptionICP,
+                  "Rank": deb,
+                  "Company": dataURL[dataIndex]["Entreprise"],
+                  "Location": "",
+                  "Greenly Geography" : "",
+                  "Industry": company.industry,
+                  "Size": company.size,
+                  "Linkedin URL": company.url_linkedin,
+                  "Firstname": "",
+                  "Lastname": "",
+                  "Position": "",
+                  "Linkedin Profile": "",
+                  "Web Domain": "",
                   "Email": "",
-                  "Telephone": ""
+                  "Phone": ""
                 })
                 //Show to the table
                 io.emit("scrap_result", {"result": result, "deb": deb});
@@ -20159,21 +20175,23 @@ async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html
                   ){
                     // console.log(user)
                     result.push({
-                        "URL": options[dataURLIndex],
-                        "isNew": "yes",
-                        "Entreprise": dataURL[dataIndex]["Entreprise"],
-                        "Localisation": /*(locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? "France" :*/ user.subline.text,
-                        "Geographie Greenly" : (locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[0] : ((locs.us.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[1] : ((locs.uk.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[2] : locs_greenly[3])),
-                        "Industrie": company.industry,
-                        "Taille": company.size,
-                        "URL Linkedin": company.url_linkedin,
-                        "Prenom": user.profile.firstName,
-                        "Nom": user.profile.lastName,
-                        "Poste": user.profile.occupation,
-                        "Profil Linkedin": user.navigationUrl,
-                        "Domaine Web": "",
-                        "Email": "",
-                        "Telephone": ""
+                      "URL": options[dataURLIndex],
+                      "isNew": "yes",
+                      "Persona": selectedOptionICP,
+                      "Rank": deb,
+                      "Company": dataURL[dataIndex]["Entreprise"],
+                      "Location": /*(locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? "France" :*/ user.subline.text,
+                      "Greenly Geography" : (locs.fr.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[0] : ((locs.us.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[1] : ((locs.uk.some(x => user.subline.text.toLowerCase().includes(x)) === true) ? locs_greenly[2] : locs_greenly[3])),
+                      "Industry": company.industry,
+                      "Size": company.size,
+                      "Linkedin URL": company.url_linkedin,
+                      "Firstname": user.profile.firstName,
+                      "Lastname": user.profile.lastName,
+                      "Position": user.profile.occupation,
+                      "Linkedin Profile": user.navigationUrl,
+                      "Web Domain": "",
+                      "Email": "",
+                      "Phone": ""
                     })
                   }
               })
@@ -20184,19 +20202,21 @@ async function getData(selectedOptionICP, dataURL, dataURLIndex, dataIndex, html
               result.push({
                 "URL": options[dataURLIndex],
                 "isNew": "notfound",
-                "Entreprise": dataURL[dataIndex]["Entreprise"],
-                "Localisation": "",
-                "Geographie Greenly" : "",
-                "Industrie": company.industry,
-                "Taille": company.size,
-                "URL Linkedin": company.url_linkedin,
-                "Prenom": "",
-                "Nom": "",
-                "Poste": "",
-                "Profil Linkedin": "",
-                "Domaine Web": "",
+                "Persona": selectedOptionICP,
+                "Rank": deb,
+                "Company": dataURL[dataIndex]["Entreprise"],
+                "Location": "",
+                "Greenly Geography" : "",
+                "Industry": company.industry,
+                "Size": company.size,
+                "Linkedin URL": company.url_linkedin,
+                "Firstname": "",
+                "Lastname": "",
+                "Position": "",
+                "Linkedin Profile": "",
+                "Web Domain": "",
                 "Email": "",
-                "Telephone": ""
+                "Phone": ""
               })
               //Show to the table
               io.emit("scrap_result", {"result": result, "deb": deb});
@@ -20269,37 +20289,41 @@ async function scrapAllCompaniesURL(selectedOption, selectedOptionICP, dataURL, 
           result.push({
             "URL": selectedOption,
             "isNew": "yes",
-            "Entreprise": entreprise,
-            "Localisation": company.loc,
-            "Geographie Greenly" : "",
-            "Industrie": company.industry,
-            "Taille": company.size,
-            "URL Linkedin": company.url_linkedin,
-            "Prenom": "",
-            "Nom": "",
-            "Poste": "",
-            "Profil Linkedin": "",
-            "Domaine Web": "",
+            "Persona": selectedOptionICP,
+            "Rank": deb,
+            "Company": entreprise,
+            "Location": company.loc,
+            "Greenly Geography" : "",
+            "Industry": company.industry,
+            "Size": company.size,
+            "Linkedin URL": company.url_linkedin,
+            "Firstname": "",
+            "Lastname": "",
+            "Position": "",
+            "Linkedin Profile": "",
+            "Web Domain": "",
             "Email": "",
-            "Telephone": ""
+            "Phone": ""
           })
         } else {
           result.push({
             "URL": selectedOption,
             "isNew": "notfound",
-            "Entreprise": entreprise,
-            "Localisation": company.loc,
-            "Geographie Greenly" : "",
-            "Industrie": company.industry,
-            "Taille": company.size,
-            "URL Linkedin": company.url_linkedin,
-            "Prenom": "",
-            "Nom": "",
-            "Poste": "",
-            "Profil Linkedin": "",
-            "Domaine Web": "",
+            "Persona": selectedOptionICP,
+            "Rank": deb,
+            "Company": entreprise,
+            "Location": company.loc,
+            "Greenly Geography" : "",
+            "Industry": company.industry,
+            "Size": company.size,
+            "Linkedin URL": company.url_linkedin,
+            "Firstname": "",
+            "Lastname": "",
+            "Position": "",
+            "Linkedin Profile": "",
+            "Web Domain": "",
             "Email": "",
-            "Telephone": ""
+            "Phone": ""
           })
         }
         //Show to the table
@@ -20314,37 +20338,41 @@ async function scrapAllCompaniesURL(selectedOption, selectedOptionICP, dataURL, 
         result.push({
           "URL": selectedOption,
           "isNew": "yes",
-          "Entreprise": dataURL[deb]["Entreprise"],
-          "Localisation": company.loc,
-          "Geographie Greenly" : "",
-          "Industrie": company.industry,
-          "Taille": company.size,
-          "URL Linkedin": company.url_linkedin,
-          "Prenom": "",
-          "Nom": "",
-          "Poste": "",
-          "Profil Linkedin": "",
-          "Domaine Web": "",
+          "Persona": selectedOptionICP,
+          "Rank": deb,
+          "Company": dataURL[deb]["Entreprise"],
+          "Location": company.loc,
+          "Greenly Geography" : "",
+          "Industry": company.industry,
+          "Size": company.size,
+          "Linkedin URL": company.url_linkedin,
+          "Firstname": "",
+          "Lastname": "",
+          "Position": "",
+          "Linkedin Profile": "",
+          "Web Domain": "",
           "Email": "",
-          "Telephone": ""
+          "Phone": ""
         })
       } else {
         result.push({
           "URL": selectedOption,
           "isNew": "notfound",
-          "Entreprise": dataURL[deb]["Entreprise"],
-          "Localisation": company.loc,
-          "Geographie Greenly" : "",
-          "Industrie": company.industry,
-          "Taille": company.size,
-          "URL Linkedin": company.url_linkedin,
-          "Prenom": "",
-          "Nom": "",
-          "Poste": "",
-          "Profil Linkedin": "",
-          "Domaine Web": "",
+          "Persona": selectedOptionICP,
+          "Rank": deb,
+          "Company": dataURL[deb]["Entreprise"],
+          "Location": company.loc,
+          "Greenly Geography" : "",
+          "Industry": company.industry,
+          "Size": company.size,
+          "Linkedin URL": company.url_linkedin,
+          "Firstname": "",
+          "Lastname": "",
+          "Position": "",
+          "Linkedin Profile": "",
+          "Web Domain": "",
           "Email": "",
-          "Telephone": ""
+          "Phone": ""
         })
       }
       //Show to the table
