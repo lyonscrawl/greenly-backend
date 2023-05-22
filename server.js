@@ -19705,6 +19705,12 @@ const dataURL = [
 ]
 
 let user_connected = false
+const client = new Client();
+try {
+    await client.login.userPass({ username:"georges@greenly.earth", password:"25079819987" });
+} catch (error) {
+    console.log(error)
+}
 
 // Quand un client se connecte, on le note dans la console
 io.on('connection', function (socket) {
@@ -19779,12 +19785,12 @@ io.on('connection', function (socket) {
 
 async function GetLinkedinDataFromCompany(selectedOptionICP, entreprise, val){
     // Login
-    const client = new Client();
-    try {
-        await client.login.userPass({ username:"georges@greenly.earth", password:"25079819987" });
-    } catch (error) {
-        console.log(error)
-    }
+    // const client = new Client();
+    // try {
+    //     await client.login.userPass({ username:"georges@greenly.earth", password:"25079819987" });
+    // } catch (error) {
+    //     console.log(error)
+    // }
     let users = []
     let company = []
     try {
