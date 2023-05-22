@@ -19832,7 +19832,7 @@ async function GetLinkedinDataFromCompany(selectedOptionICP, entreprise, val){
           }
         }
     } catch (error) {
-      if(error.response.status === 429){
+      if(error.response !== undefined && error.response.status !== undefined && error.response.status === 429){
         console.log("==>> erreur", error.response.statusText)
         io.emit("scrap_error");
         io.emit("scrap_end");
