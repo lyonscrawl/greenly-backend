@@ -19802,7 +19802,9 @@ async function GetLinkedinDataFromCompany(selectedOptionICP, entreprise, val){
         // (type%3ATITLE%2Cvalues
         // List((text%3A%2528%25E2%2580%2599Directeur%25E2%2580%2599%2520OR%2520%25E2%2580%2598Directrice%25E2%2580%2599%2520OR%2520%25E2%2580%2598Director%25E2%2580%2599%2520OR%2520%25E2%2580%2598Head%2520of%25E2%2580%2599%2520OR%2520%25E2%2580%2598Project%2520Manager%25E2%2580%2599%2520OR%2520%25E2%2580%2598Charg%25C3%25A9%25E2%2580%2599%2520OR%2520%25E2%2580%2598Charg%25C3%25A9e%25E2%2580%2599%2520OR%2520%25E2%2580%2598Chef%2520de%2520Projet%25E2%2580%2599%2520OR%2520%25E2%2580%2598Cheffe%2520de%2520Projet%25E2%2580%2599%2520OR%2520%25E2%2580%2598Coordinateur%25E2%2580%2599%2520OR%2520%2527Responsable%2527%2520OR%2520%2527Coordinatrice%2527%2520OR%2520%25E2%2580%2598Coordinator%25E2%2580%2599%2520OR%2520%25E2%2580%2598Chief%25E2%2580%2599%2520OR%2520%25E2%2580%2598Manager%25E2%2580%2599%2520OR%2520%25E2%2580%2598Partner%25E2%2580%2599%2520OR%2520%25E2%2580%2598Analyste%25E2%2580%2599%2529%2520AND%2520%2528%2527RSE%2527%2520OR%2520%2520%25E2%2580%2598QSE%25E2%2580%2599%2520OR%2520%25E2%2580%2598HSE%25E2%2580%2599%2520OR%2520%25E2%2580%2598QHSE%25E2%2580%2599%2520OR%2520%25E2%2580%2598Environnement%25E2%2580%2599%2520OR%2520%25E2%2580%2598D%25C3%25A9veloppement%2520Durable%25E2%2580%2599%2520OR%2520%25E2%2580%2598Sustainability%25E2%2580%2599%2520OR%2520%25E2%2580%2598ESG%25E2%2580%2599%2520OR%2520%25E2%2580%2598ISR%25E2%2580%2599%2520OR%2520%25E2%2580%2598CSR%25E2%2580%2599%2520OR%2520%25E2%2580%2598Impact%25E2%2580%2599%2520OR%2520%25E2%2580%2598Impact%25E2%2580%2599%2520OR%2520%25E2%2580%2598Climat%25E2%2580%2599%2520OR%2520%25E2%2580%2598Climate%25E2%2580%2599%2520OR%2520%25E2%2580%2598Num%25C3%25A9rique%2520Responsable%25E2%2580%2599%2520OR%2520%25E2%2580%2598Bas-carbone%25E2%2580%2599%2529%2520OR%2520%2528%25E2%2580%2599Directeur%25E2%2580%2599%2520OR%2520%25E2%2580%2598Directrice%25E2%2580%2599%2520OR%2520%25E2%2580%2598Director%25E2%2580%2599%2520OR%2520%25E2%2580%2598Chief%25E2%2580%2599%2520OR%2520%25E2%2580%2598Head%2520of%25E2%2580%2599%2529%2520AND%2520%2528%25E2%2580%2599Op%25C3%25A9rations%25E2%2580%2599%2520OR%2520%25E2%2580%2598Operations%25E2%2580%2599%2520OR%2520%25E2%2580%2598Achats%25E2%2580%2599%2520OR%2520%25E2%2580%2598Procurement%25E2%2580%2599%2520OR%2520%25E2%2580%2598Achats%2520Responsables%25E2%2580%2599%2520OR%2520%25E2%2580%2598Qualit%25C3%25A9%25E2%2580%2599%2520OR%2520%25E2%2580%2598Strat%25C3%25A9gie%25E2%2580%2599%2520OR%2520%25E2%2580%2598Finance%25E2%2580%2599%2520OR%2520%25E2%2580%2598Qualit%25C3%25A9%25E2%2580%2599%2520OR%2520%25E2%2580%2598Conformit%25C3%25A9%25E2%2580%2599%2529%2520NOT%2520%2528%25E2%2580%2598Sales%25E2%2580%2599%2520OR%2520%25E2%2580%2598Commercial%25E2%2580%2599%2520OR%2520%25E2%2580%2598Adjoint%25E2%2580%2599%2520OR%2520%25E2%2580%2598Assistant%25E2%2580%2599%2520OR%2520%25E2%2580%2598Stagiaire%25E2%2580%2599%2520OR%2520%25E2%2580%2598Consultant%25E2%2580%2599%2520OR%2520%25E2%2580%2598Talent%25E2%2580%2599%2520OR%2520%25E2%2580%2598Lecturer%25E2%2580%2599%2520OR%2520%25E2%2580%2598Freelance%25E2%2580%2599%2520OR%2520%25E2%2580%2598R%2526D%25E2%2580%2599%2520OR%2520%25E2%2580%2598SI%25E2%2580%2599%2520OR%2520%25E2%2580%2598IT%25E2%2580%2599%2520OR%2520%25E2%2580%2598Administrateur%25E2%2580%2599%2520OR%2520%25E2%2580%2598Business%25E2%2580%2599%2520OR%2520%25E2%2580%2598Fresque%25E2%2580%2599%2520OR%2520%25E2%2580%2598Advisor%25E2%2580%2599%2520OR%2520%25E2%2580%2598S%25C3%25A9curit%25C3%25A9%25E2%2580%2599%2520Or%2520%25E2%2580%2598Investor%25E2%2580%2599%2529%2520OR%2520%2528%25E2%2580%2599CEO%25E2%2580%2599%2520OR%2520%25E2%2580%2598PDG%25E2%2580%2599%2520OR%2520%25E2%2580%2598Directeur%2520G%25C3%25A9n%25C3%25A9ral%25E2%2580%2599%2520OR%2520%25E2%2580%2598Co-founder%25E2%2580%2599%2520OR%2520%25E2%2580%2598Chief%2520of%2520Staff%25E2%2580%2599%2520OR%2520%25E2%2580%2598Partner%25E2%2580%2599%2520OR%2520%25E2%2580%2598COO%25E2%2580%2599%2520OR%2520%25E2%2580%2598CMO%25E2%2580%2599%2529%2520OR%2520%2528%25E2%2580%2599Directeur%25E2%2580%2599%2520OR%2520%25E2%2580%2598Directrice%25E2%2580%2599%2520OR%2520%25E2%2580%2598Director%25E2%2580%2599%2520OR%2520%25E2%2580%2598Chief%25E2%2580%2599%2520OR%2520%25E2%2580%2598Head%2520of%25E2%2580%2599%2529%2520AND%2520%2528%25E2%2580%2599Op%25C3%25A9rations%25E2%2580%2599%2520OR%2520%25E2%2580%2598Operations%25E2%2580%2599%2520OR%2520%25E2%2580%2598Achats%25E2%2580%2599%2520OR%2520%25E2%2580%2598Procurement%25E2%2580%2599%2520OR%2520%25E2%2580%2598Achats%2520Responsables%25E2%2580%2599%2520OR%2520%25E2%2580%2598Qualit%25C3%25A9%25E2%2580%2599%2520OR%2520%25E2%2580%2598Marketing%25E2%2580%2599%2520OR%2520%25E2%2580%2598Communication%25E2%2580%2599%2520OR%2520%25E2%2580%2598Strat%25C3%25A9gie%25E2%2580%2599%2520OR%2520%25E2%2580%2598Finance%25E2%2580%2599%2520OR%2520%25E2%2580%2598Qualit%25C3%25A9%25E2%2580%2599%2520OR%2520%25E2%2580%2598Conformit%25C3%25A9%25E2%2580%2599%2529%2520NOT%2520%2528%25E2%2580%2598Sales%25E2%2580%2599%2520OR%2520%25E2%2580%2598Commercial%25E2%2580%2599%2520OR%2520%25E2%2580%2598Adjoint%25E2%2580%2599%2520OR%2520%25E2%2580%2598Assistant%25E2%2580%2599%2520OR%2520%25E2%2580%2598Stagiaire%25E2%2580%2599%2520OR%2520%25E2%2580%2598Consultant%25E2%2580%2599%2520OR%2520%25E2%2580%2598Freelance%25E2%2580%2599%2520OR%2520%25E2%2580%2598R%2526D%25E2%2580%2599%2520OR%2520%25E2%2580%2598DSI%25E2%2580%2599%2520OR%2520%25E2%2580%2598SI%25E2%2580%2599%2520OR%2520%25E2%2580%2598IT%25E2%2580%2599%2520OR%2520%25E2%2580%2598Administrateur%25E2%2580%2599%2520OR%2520%25E2%2580%2598Business%2520Partner%25E2%2580%2599%2529%2CselectionType%3AINCLUDED))
         //'Directeur OR Directrice OR Director OR Head of OR Project Manager OR Chargé OR Chargée OR Chef de Projet OR Cheffe de Projet OR Coordinateur OR Responsable OR Coordinatrice OR Coordinator OR Chief OR Manager OR Partner OR Analyste'
+        // console.log("test1")
         company = await companiesScroller.fetch()
+        // console.log("test2")
         if(company.length <= 0 || company[0] === undefined || company[0].title || company[0].headline === undefined || company[0].subline === undefined || company[0].company === undefined || company[0].subline.text === undefined){
           // console.log(company[0].subline.text.split(" ")[0].split("-")[0].replace(",",""), parseInt(company[0].subline.text.split(" ")[0].split("-")[0].replace(",","")))
           if(
@@ -19815,17 +19817,19 @@ async function GetLinkedinDataFromCompany(selectedOptionICP, entreprise, val){
             // console.log("=======> ",company[0])
             if(val === true){
               if(selectedOptionICP === optionsICP[0]){
-                const jobs1 = await client.search.searchPeople({filters: { company: entreprise, title: jobsICP[0]},keywords: entreprise,limit: 50}).fetch()
-                const jobs2 = await client.search.searchPeople({filters: { company: entreprise, title: jobsICP[1]},keywords: entreprise,limit: 50}).fetch()
-                const jobs3 = await client.search.searchPeople({filters: { company: entreprise, title: jobsICP[3]},keywords: entreprise,limit: 50}).fetch()
+                const jobs1 = await client.search.searchPeople({filters: { company: entreprise, title: jobsICP[0]},keywords: entreprise,limit: 20}).fetch()
+                const jobs2 = await client.search.searchPeople({filters: { company: entreprise, title: jobsICP[1]},keywords: entreprise,limit: 20}).fetch()
+                const jobs3 = await client.search.searchPeople({filters: { company: entreprise, title: jobsICP[3]},keywords: entreprise,limit: 20}).fetch()
                 users = users.concat(jobs1)
                 users = users.concat(jobs2)
                 users = users.concat(jobs3)
                 users = [...new Map(users.map(v => [v["navigationUrl"], v])).values()]
               } else {
+                // console.log("test3")
                 let titleICP = (selectedOptionICP === optionsICP[0]) ? jobsICP[0] : ( (selectedOptionICP === optionsICP[1]) ? jobsICP[1] : ( (selectedOptionICP === optionsICP[2]) ? jobsICP[2] : jobsICP[3] ) )
                 users = await client.search.searchPeople({filters: { company: entreprise, title: titleICP},keywords: entreprise,limit: 50}).fetch()
-              }              
+                // console.log("test4")
+              }
             } 
             // else {
             //   const peopleScroller = client.search.searchPeople({
@@ -19838,9 +19842,9 @@ async function GetLinkedinDataFromCompany(selectedOptionICP, entreprise, val){
           }
         }
     } catch (error) {
-      if(error.response !== undefined && error.response.status !== undefined && error.response.status === 429){
-        console.log("==>> erreur", error.response.statusText)
-        io.emit("scrap_error");
+      if(error.response !== undefined && error.response.status !== undefined){
+        console.log("==>> erreur", error.response.statusText, error.response.status)
+        io.emit("scrap_error", {"text": error.response.statusText, "code": error.response.status});
         io.emit("scrap_end");
         clearInterval(timerInt)
       } else {
